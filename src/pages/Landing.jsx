@@ -43,7 +43,7 @@ export default function Landing({ t, onNavigate }) {
       >
         <div>
           <div style={{ fontSize: 14, color: t.text, fontWeight: done ? "bold" : "normal" }}>{lote.label}</div>
-          <div style={{ fontSize: 11, color: t.muted, marginTop: 2 }}>{lote.cards.length} palabras</div>
+          <div style={{ fontSize: 11, color: t.muted, marginTop: 2, fontFamily: fonts.ui }}>{lote.cards.length} palabras</div>
         </div>
         <div style={{ fontSize: 16, color: done ? t.gold : locked ? t.subtle : t.muted }}>
           {done ? "✦" : locked ? "⊗" : "→"}
@@ -60,8 +60,8 @@ export default function Landing({ t, onNavigate }) {
 
         <div style={{ marginTop: 40, background: t.card, border: "1px solid " + t.border, borderRadius: 16, padding: "28px 32px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-            <span style={{ fontSize: 13, color: t.muted }}>Progreso total</span>
-            <span style={{ fontSize: 13, color: t.gold }}>{mastered}/{ALL_CARDS.length} palabras</span>
+            <span style={{ fontSize: 13, color: t.muted, fontFamily: fonts.ui }}>Progreso total</span>
+            <span style={{ fontSize: 13, color: t.gold, fontFamily: fonts.ui }}>{mastered}/{ALL_CARDS.length} palabras</span>
           </div>
           <div style={{ width: "100%", height: 6, background: t.surface, borderRadius: 3, overflow: "hidden" }}>
             <div style={{ height: "100%", width: pct + "%", background: "linear-gradient(90deg," + t.gold + "," + t.goldLight + ")", borderRadius: 3, transition: "width 0.5s" }} />
@@ -69,15 +69,15 @@ export default function Landing({ t, onNavigate }) {
           <div style={{ display: "flex", justifyContent: "space-around", marginTop: 20 }}>
             <div style={{ textAlign: "center" }}>
               <div style={{ fontSize: 24, fontWeight: "bold", color: t.text }}>{mastered}</div>
-              <div style={{ fontSize: 11, color: t.muted, marginTop: 2, letterSpacing: 1, textTransform: "uppercase" }}>dominadas</div>
+              <div style={{ fontSize: 11, color: t.muted, marginTop: 2, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui }}>dominadas</div>
             </div>
             <div style={{ textAlign: "center" }}>
               <div style={{ fontSize: 24, fontWeight: "bold", color: t.text }}>{ALL_CARDS.length - mastered}</div>
-              <div style={{ fontSize: 11, color: t.muted, marginTop: 2, letterSpacing: 1, textTransform: "uppercase" }}>pendientes</div>
+              <div style={{ fontSize: 11, color: t.muted, marginTop: 2, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui }}>pendientes</div>
             </div>
             <div style={{ textAlign: "center" }}>
               <div style={{ fontSize: 24, fontWeight: "bold", color: practicedToday ? t.correct : t.text }}>{progress.streak || 0}</div>
-              <div style={{ fontSize: 11, color: t.muted, marginTop: 2, letterSpacing: 1, textTransform: "uppercase" }}>dias seguidos</div>
+              <div style={{ fontSize: 11, color: t.muted, marginTop: 2, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui }}>dias seguidos</div>
             </div>
           </div>
           {practicedToday && (
@@ -107,7 +107,7 @@ export default function Landing({ t, onNavigate }) {
           <div style={{ display: "flex", flexDirection: "column", gap: 20, marginBottom: 16 }}>
             {niveles.map(n => (
               <div key={n.nivel}>
-                <div style={{ fontSize: 11, color: t.muted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 8, paddingLeft: 4 }}>
+                <div style={{ fontSize: 11, color: t.muted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 8, paddingLeft: 4, fontFamily: fonts.ui }}>
                   {n.label}
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>

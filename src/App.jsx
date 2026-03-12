@@ -14,38 +14,47 @@ export default function App() {
     setPage(dest);
   }
 
+  const topbarBg = isDark ? "rgba(10,10,10,0.96)" : "rgba(255,255,255,0.96)";
+
   const navStyle = {
-    position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
-    background: t.bg + "ee", backdropFilter: "blur(8px)",
+    position: "fixed", top: 0, left: 0, right: 0, zIndex: 200,
+    height: 60,
+    background: topbarBg,
+    backdropFilter: "blur(10px)",
     borderBottom: "1px solid " + t.border,
-    display: "flex", justifyContent: "space-between", alignItems: "center",
-    padding: "12px 24px", fontFamily: fonts.serif,
+    display: "flex", alignItems: "center",
+    padding: "0 max(20px, calc((100vw - 760px) / 2))",
+    boxSizing: "border-box",
+  };
+
+  const tbarBtn = {
+    appearance: "none", border: "none", background: "transparent",
+    width: 44, height: 44,
+    display: "inline-flex", alignItems: "center", justifyContent: "center",
+    fontFamily: fonts.ui, fontSize: 15, fontWeight: 500,
+    color: t.muted, borderRadius: 12, cursor: "pointer",
   };
 
   return (
-    <div style={{ background: t.bg, minHeight: "100vh", paddingTop: 52 }}>
+    <div style={{ background: t.bg, minHeight: "100vh", paddingTop: 60 }}>
       <nav style={navStyle}>
         <button onClick={() => setPage("home")} style={{
-          background: "none", border: "none", color: t.gold,
-          fontSize: 16, fontFamily: fonts.serif, cursor: "pointer", fontWeight: "bold",
+          background: "none", border: "none", cursor: "pointer",
+          display: "flex", flexDirection: "column", gap: 2, lineHeight: 1.15, padding: 0,
         }}>
-          אולפן ספרדי
+          <span style={{ fontSize: 17, fontWeight: 650, color: t.text, fontFamily: fonts.serif }}>
+            אולפן ספרדי
+          </span>
+          <span style={{ fontSize: 12, color: t.muted, fontFamily: fonts.ui }}>
+            by Shlomo Peretz
+          </span>
         </button>
-        <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
+        <div style={{ marginLeft: "auto", display: "flex", gap: 2, alignItems: "center" }}>
           {page !== "home" && (
-            <button onClick={() => setPage("home")} style={{
-              background: "none", border: "none", color: t.muted,
-              fontSize: 12, fontFamily: fonts.serif, cursor: "pointer",
-            }}>
-              ← inicio
-            </button>
+            <button onClick={() => setPage("home")} style={tbarBtn}>←</button>
           )}
-          <button onClick={() => setIsDark(d => !d)} style={{
-            background: "none", border: "1px solid " + t.border,
-            borderRadius: 20, padding: "3px 12px", fontSize: 11,
-            cursor: "pointer", color: t.muted, fontFamily: fonts.serif,
-          }}>
-            {isDark ? "☀ claro" : "☾ oscuro"}
+          <button onClick={() => setIsDark(d => !d)} style={tbarBtn}>
+            {isDark ? "☀" : "☾"}
           </button>
         </div>
       </nav>
