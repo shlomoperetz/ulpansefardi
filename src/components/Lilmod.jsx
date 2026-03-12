@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LOTES } from "../data/cards";
+import { LOTES, BINYAN_COLORS } from "../data/cards";
 import { fonts } from "../theme";
 
 export default function Lilmod({ t, loteId, onBack }) {
@@ -44,6 +44,18 @@ export default function Lilmod({ t, loteId, onBack }) {
       >
         <div style={{ fontSize: 48, fontWeight: "bold", direction: "rtl", lineHeight: 1.3 }}>{card.he}</div>
         <div style={{ fontSize: 14, color: t.muted, fontStyle: "italic", fontFamily: fonts.ui }}>{card.tr}</div>
+
+        {card.binyan && (() => {
+          const color = BINYAN_COLORS[card.binyan];
+          return (
+            <span style={{
+              fontSize: 12, padding: "2px 12px", borderRadius: 12, fontFamily: fonts.serif,
+              background: color + "22", color, border: "1px solid " + color + "55",
+            }}>
+              {card.binyan}
+            </span>
+          );
+        })()}
 
         {revealed ? (
           <div style={{ fontSize: 26, color: t.text, marginTop: 12, fontFamily: fonts.ui }}>{card.es}</div>

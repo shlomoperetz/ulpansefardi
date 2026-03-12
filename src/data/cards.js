@@ -33,37 +33,51 @@ export const ADJECTIVES = [
   { he: "צָעִיר", tr: "tzair", es: "joven" },
 ];
 
+export const BINYAN_COLORS = {
+  "פָּעַל":     "#3b82f6",
+  "פִּיעֵל":    "#8b5cf6",
+  "הִפְעִיל":   "#f59e0b",
+  "הִתְפַּעֵל": "#10b981",
+  "נִפְעַל":    "#f43f5e",
+};
+
+const PA = "פָּעַל";
+const PI = "פִּיעֵל";
+const HI = "הִפְעִיל";
+const HT = "הִתְפַּעֵל";
+const NI = "נִפְעַל";
+
 export const VERBS = [
-  { he: "לֶאֱכוֹל", tr: "leejol", es: "comer" },
-  { he: "לִשְׁתּוֹת", tr: "lishtot", es: "beber" },
-  { he: "לַעֲבוֹד", tr: "laavod", es: "trabajar" },
-  { he: "לִלְמוֹד", tr: "lilmod", es: "estudiar" },
-  { he: "לָגוּר", tr: "lagur", es: "vivir" },
-  { he: "לָבוֹא", tr: "lavo", es: "venir" },
-  { he: "לַחְזוֹר", tr: "lajzor", es: "volver" },
-  { he: "לְהַגִּיעַ", tr: "lehagia", es: "llegar" },
-  { he: "לִנְסוֹעַ", tr: "linsoa", es: "viajar" },
-  { he: "לָקוּם", tr: "lakum", es: "levantarse" },
-  { he: "לִקְרוֹא", tr: "likro", es: "leer" },
-  { he: "לִכְתּוֹב", tr: "lichtov", es: "escribir" },
-  { he: "לְדַבֵּר", tr: "ledaber", es: "hablar" },
-  { he: "לִרְאוֹת", tr: "lirot", es: "ver" },
-  { he: "לְהִסְתַּכֵּל", tr: "lehistakel", es: "mirar" },
-  { he: "לִרְצוֹת", tr: "lirtzot", es: "querer" },
-  { he: "לַעֲשׂוֹת", tr: "laasot", es: "hacer" },
-  { he: "לְהָבִין", tr: "lehavin", es: "entender" },
-  { he: "לְהַכִּיר", tr: "lehakir", es: "conocer" },
-  { he: "לְהַרְגִּישׁ", tr: "lehargish", es: "sentir" },
-  { he: "לְהַתְחִיל", tr: "lehatchil", es: "empezar" },
-  { he: "לְהַמְשִׁיךְ", tr: "lehamshich", es: "continuar" },
-  { he: "לְהַפְסִיק", tr: "lehafsik", es: "parar" },
-  { he: "לְשַׁלֵּם", tr: "leshalem", es: "pagar" },
-  { he: "לְחַכּוֹת", tr: "lechakot", es: "esperar" },
-  { he: "לְהִתְקַלֵּחַ", tr: "lehitkaleaj", es: "ducharse" },
-  { he: "לְהִתְלַבֵּשׁ", tr: "lehitalbesh", es: "vestirse" },
-  { he: "לְהִתְעוֹרֵר", tr: "lehitorer", es: "despertarse" },
-  { he: "לְהִירָדֵם", tr: "lehiradem", es: "dormirse" },
-  { he: "לְהִתְפַּלֵּל", tr: "lehitpalel", es: "rezar" },
+  { he: "לֶאֱכוֹל",    tr: "leejol",      es: "comer",      binyan: PA },
+  { he: "לִשְׁתּוֹת",  tr: "lishtot",     es: "beber",      binyan: PA },
+  { he: "לַעֲבוֹד",    tr: "laavod",      es: "trabajar",   binyan: PA },
+  { he: "לִלְמוֹד",    tr: "lilmod",      es: "estudiar",   binyan: PA },
+  { he: "לָגוּר",      tr: "lagur",       es: "vivir",      binyan: PA },
+  { he: "לָבוֹא",      tr: "lavo",        es: "venir",      binyan: PA },
+  { he: "לַחְזוֹר",    tr: "lajzor",      es: "volver",     binyan: PA },
+  { he: "לְהַגִּיעַ",  tr: "lehagia",     es: "llegar",     binyan: HI },
+  { he: "לִנְסוֹעַ",   tr: "linsoa",      es: "viajar",     binyan: PA },
+  { he: "לָקוּם",      tr: "lakum",       es: "levantarse", binyan: PA },
+  { he: "לִקְרוֹא",    tr: "likro",       es: "leer",       binyan: PA },
+  { he: "לִכְתּוֹב",   tr: "lichtov",     es: "escribir",   binyan: PA },
+  { he: "לְדַבֵּר",    tr: "ledaber",     es: "hablar",     binyan: PI },
+  { he: "לִרְאוֹת",    tr: "lirot",       es: "ver",        binyan: PA },
+  { he: "לְהִסְתַּכֵּל", tr: "lehistakel", es: "mirar",     binyan: HT },
+  { he: "לִרְצוֹת",    tr: "lirtzot",     es: "querer",     binyan: PA },
+  { he: "לַעֲשׂוֹת",   tr: "laasot",      es: "hacer",      binyan: PA },
+  { he: "לְהָבִין",    tr: "lehavin",     es: "entender",   binyan: HI },
+  { he: "לְהַכִּיר",   tr: "lehakir",     es: "conocer",    binyan: HI },
+  { he: "לְהַרְגִּישׁ", tr: "lehargish",  es: "sentir",     binyan: HI },
+  { he: "לְהַתְחִיל",  tr: "lehatchil",   es: "empezar",    binyan: HI },
+  { he: "לְהַמְשִׁיךְ", tr: "lehamshich", es: "continuar",  binyan: HI },
+  { he: "לְהַפְסִיק",  tr: "lehafsik",    es: "parar",      binyan: HI },
+  { he: "לְשַׁלֵּם",   tr: "leshalem",    es: "pagar",      binyan: PI },
+  { he: "לְחַכּוֹת",   tr: "lechakot",    es: "esperar",    binyan: PI },
+  { he: "לְהִתְקַלֵּחַ", tr: "lehitkaleaj", es: "ducharse", binyan: HT },
+  { he: "לְהִתְלַבֵּשׁ", tr: "lehitalbesh", es: "vestirse", binyan: HT },
+  { he: "לְהִתְעוֹרֵר", tr: "lehitorer",  es: "despertarse", binyan: HT },
+  { he: "לְהִירָדֵם",  tr: "lehiradem",   es: "dormirse",   binyan: NI },
+  { he: "לְהִתְפַּלֵּל", tr: "lehitpalel", es: "rezar",     binyan: HT },
 ];
 
 export const ALL_CARDS = [...ADJECTIVES, ...VERBS];

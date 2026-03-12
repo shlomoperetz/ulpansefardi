@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { LOTES } from "../data/cards";
+import { LOTES, BINYAN_COLORS } from "../data/cards";
 import { fonts } from "../theme";
 import { getProgress, saveCardResult, markTodayDone, markLoteDone, isLoteDone, isLoteUnlocked } from "../utils/storage";
 
@@ -151,6 +151,18 @@ export default function Anki({ t, loteId, onBack }) {
         <div style={{ fontSize: 11, color: t.subtle, letterSpacing: 1, textTransform: "uppercase", alignSelf: "flex-end", fontFamily: fonts.ui }}>{active.length} restantes</div>
         <div style={{ fontSize: 12, color: t.muted, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui }}>{phase === 1 ? "Que significa?" : "Como se dice en hebreo?"}</div>
         <div style={{ fontSize: 36, fontWeight: "bold", color: t.text, textAlign: "center", lineHeight: 1.3, direction: "auto" }}>{question}</div>
+
+        {current?.binyan && (() => {
+          const color = BINYAN_COLORS[current.binyan];
+          return (
+            <span style={{
+              fontSize: 12, padding: "2px 12px", borderRadius: 12, fontFamily: fonts.serif,
+              background: color + "22", color, border: "1px solid " + color + "55",
+            }}>
+              {current.binyan}
+            </span>
+          );
+        })()}
 
         {phase === 1 && current && (
           <button style={{ background: "none", border: "1px solid " + t.border, color: t.muted, fontSize: 12, padding: "4px 14px", borderRadius: 20, cursor: "pointer", fontFamily: fonts.ui }} onClick={() => setShowTr(v => !v)}>
