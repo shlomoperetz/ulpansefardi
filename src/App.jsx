@@ -4,7 +4,7 @@ import Landing from "./pages/Landing";
 import Anki from "./components/Anki";
 
 export default function App() {
-  const [isDark, setIsDark] = useState(true);
+  const [isDark, setIsDark] = useState(false);
   const [page, setPage] = useState("home");
   const [activeLote, setActiveLote] = useState(1);
   const t = isDark ? dark : light;
