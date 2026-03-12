@@ -43,6 +43,7 @@ export default function Anki({ t, loteId, onBack }) {
   const [transition, setTransition] = useState(false);
   const [done, setDone] = useState(false);
   const [showKb, setShowKb] = useState(false);
+  const [lastInput, setLastInput] = useState("");
   const inputRef = useRef(null);
 
   const active = cards.filter(c => c.correct < MASTERY);
@@ -72,6 +73,7 @@ export default function Anki({ t, loteId, onBack }) {
 
   function submit() {
     if (!current || feedback) return;
+    setLastInput(input);
     const answer = phase === 1 ? current.es : current.he;
     const ok = phase === 1
       ? norm(input) === norm(answer) ||
@@ -200,10 +202,16 @@ export default function Anki({ t, loteId, onBack }) {
               {feedback === "correct" ? "correcto" : "incorrecto"}
             </div>
             {feedback === "wrong" && (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "16px 24px", background: t.bg, borderRadius: 10, width: "100%", textAlign: "center" }}>
-                <span style={{ fontSize: 11, color: t.subtle, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui }}>Respuesta</span>
-                <span style={{ fontSize: 24, color: t.text, fontWeight: "bold", direction: "auto" }}>{answer}</span>
-                {phase === 1 && <span style={{ fontSize: 13, color: t.muted, fontStyle: "italic", fontFamily: fonts.ui }}>{current.tr}</span>}
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, padding: "16px 24px", background: t.bg, borderRadius: 10, width: "100%", textAlign: "center" }}>
+                <div style={{ width: "100%" }}>
+                  <span style={{ fontSize: 11, color: t.subtle, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui }}>Tu respuesta</span>
+                  <div style={{ fontSize: 20, color: t.wrong, fontWeight: "bold", direction: "auto", marginTop: 4, textDecoration: "line-through", opacity: 0.8 }}>{lastInput}</div>
+                </div>
+                <div style={{ width: "100%", borderTop: "1px solid " + t.border, paddingTop: 12 }}>
+                  <span style={{ fontSize: 11, color: t.subtle, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui }}>Correcto</span>
+                  <div style={{ fontSize: 24, color: t.text, fontWeight: "bold", direction: "auto", marginTop: 4 }}>{answer}</div>
+                  {phase === 1 && <span style={{ fontSize: 13, color: t.muted, fontStyle: "italic", fontFamily: fonts.ui }}>{current.tr}</span>}
+                </div>
               </div>
             )}
             {feedback === "wrong" && <button style={{ background: "none", border: "1px solid " + t.border, borderRadius: 20, padding: "6px 20px", color: t.gold, fontSize: 13, cursor: "pointer", fontFamily: fonts.ui }} onClick={next}>Continuar</button>}
