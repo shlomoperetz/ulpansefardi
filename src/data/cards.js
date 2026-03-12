@@ -63,39 +63,51 @@ export const NUCLEUS_CARDS = [
 ];
 
 // ─── Adjetivos ────────────────────────────────────────────────────────────────
+// Lote 11 — emociones (0-7, 8 cartas)
+// Lote 12 — estado 1  (8-13, 6 cartas)
+// Lote 13 — estado 2  (14-19, 6 cartas)
+// Lote 14 — descripción 1 (20-24, 5 cartas)
+// Lote 15 — descripción 2 (25-29, 5 cartas)
 export const ADJECTIVES = [
-  { he: "חָזָק",      tr: "jazak",      es: "fuerte" },
-  { he: "חַלָּשׁ",    tr: "jalash",     es: "debil" },
-  { he: "שְׂמֵחָה",   tr: "smeja",      es: "alegre (f)" },
-  { he: "עֲצוּבָה",   tr: "atzuba",     es: "triste (f)" },
-  { he: "קָרוֹב",     tr: "karov",      es: "cerca" },
-  { he: "רָחוֹק",     tr: "rajok",      es: "lejos" },
-  { he: "יָשָׁן",     tr: "yashan",     es: "viejo (objeto)" },
-  { he: "חָדָשׁ",     tr: "jadash",     es: "nuevo" },
-  { he: "יָשֵׁן",     tr: "yashen",     es: "dormido" },
-  { he: "יְשֵׁנָה",   tr: "yeshena",    es: "dormida" },
-  { he: "יְשֵׁנִים",  tr: "yeshenim",   es: "dormidos" },
-  { he: "יְשֵׁנוֹת",  tr: "yashenot",   es: "dormidas" },
-  { he: "עֵר",        tr: "er",         es: "despierto" },
-  { he: "עֵרָה",      tr: "era",        es: "despierta" },
-  { he: "עֵרִים",     tr: "erim",       es: "despiertos" },
-  { he: "עֵרוֹת",     tr: "erot",       es: "despiertas" },
-  { he: "פָּנוּי",    tr: "panuy",      es: "libre" },
-  { he: "עָסוּק",     tr: "asuk",       es: "ocupado" },
-  { he: "מְעַנְיֵן",  tr: "meanyen",    es: "interesante" },
-  { he: "מְשַׁעֲמֵם", tr: "meshaamen",  es: "aburrido" },
-  { he: "נָמוּךְ",    tr: "namuj",      es: "bajo (altura)" },
-  { he: "גָּבוֹהַ",   tr: "gavoha",     es: "alto (altura)" },
-  { he: "דָּתִי",     tr: "dati",       es: "religioso" },
-  { he: "חִילוֹנִי",  tr: "jiloni",     es: "laico" },
-  { he: "נָקִי",      tr: "naki",       es: "limpio" },
-  { he: "מְלֻכְלָךְ", tr: "meluklak",   es: "sucio" },
-  { he: "קָצָר",      tr: "katzar",     es: "corto" },
-  { he: "אָרוֹךְ",    tr: "arok",       es: "largo" },
-  { he: "רָעֵב",      tr: "raev",       es: "hambriento" },
-  { he: "שָׂבֵעַ",    tr: "savea",      es: "saciado" },
-  { he: "מְבוּגָר",   tr: "mevugar",    es: "mayor / adulto" },
-  { he: "צָעִיר",     tr: "tzair",      es: "joven" },
+  // ── Lote 11: emociones ────────────────────────────────────────────────────
+  { he: "חָזָק",      tr: "jazak",    es: "fuerte" },
+  { he: "חַלָּשׁ",    tr: "jalash",   es: "débil" },
+  { he: "שָׂמֵחַ",    tr: "sameaj",   es: "alegre (m)" },   // par masculino — era שְׂמֵחָה sin este
+  { he: "שְׂמֵחָה",   tr: "smeja",    es: "alegre (f)" },
+  { he: "עָצוּב",     tr: "atzuv",    es: "triste (m)" },   // par masculino — era עֲצוּבָה sin este
+  { he: "עֲצוּבָה",   tr: "atzuba",   es: "triste (f)" },
+  { he: "קָרוֹב",     tr: "karov",    es: "cerca" },
+  { he: "רָחוֹק",     tr: "rajok",    es: "lejos" },
+
+  // ── Lote 12: estado 1 ─────────────────────────────────────────────────────
+  { he: "יָשָׁן",     tr: "yashan",   es: "viejo (objeto)" },
+  { he: "חָדָשׁ",     tr: "jadash",   es: "nuevo" },
+  { he: "יָשֵׁן",     tr: "yashen",   es: "dormido (m)" },  // antes ×4 formas → solo m/f
+  { he: "יְשֵׁנָה",   tr: "yeshena",  es: "dormida (f)" },
+  { he: "עֵר",        tr: "er",       es: "despierto (m)" }, // antes ×4 formas → solo m/f
+  { he: "עֵרָה",      tr: "era",      es: "despierta (f)" },
+
+  // ── Lote 13: estado 2 ─────────────────────────────────────────────────────
+  { he: "פָּנוּי",    tr: "panuy",    es: "libre" },
+  { he: "עָסוּק",     tr: "asuk",     es: "ocupado" },
+  { he: "מְעַנְיֵן",  tr: "meanyen",  es: "interesante" },
+  { he: "מְשַׁעֲמֵם", tr: "meshaamen",es: "aburrido" },
+  { he: "נָמוּךְ",    tr: "namuj",    es: "bajo (altura)" },
+  { he: "גָּבוֹהַ",   tr: "gavoha",   es: "alto (altura)" },
+
+  // ── Lote 14: descripción 1 ────────────────────────────────────────────────
+  { he: "דָּתִי",     tr: "dati",     es: "religioso" },
+  { he: "חִילוֹנִי",  tr: "jiloni",   es: "laico" },
+  { he: "נָקִי",      tr: "naki",     es: "limpio" },
+  { he: "מְלֻכְלָךְ", tr: "meluklak", es: "sucio" },
+  { he: "קָצָר",      tr: "katzar",   es: "corto" },
+
+  // ── Lote 15: descripción 2 ────────────────────────────────────────────────
+  { he: "אָרוֹךְ",    tr: "arok",     es: "largo" },
+  { he: "רָעֵב",      tr: "raev",     es: "hambriento" },
+  { he: "שָׂבֵעַ",    tr: "savea",    es: "saciado" },
+  { he: "מְבוּגָר",   tr: "mevugar",  es: "mayor / adulto" },
+  { he: "צָעִיר",     tr: "tzair",    es: "joven" },
 ];
 
 // ─── Verbos ───────────────────────────────────────────────────────────────────
@@ -159,10 +171,10 @@ export const LOTES = [
   { id: 10, label: "Verbos — rutina",        nivel: 1, cards: VERBS.slice(24),      requires: [9] },
 
   // NIVEL 1 — Adjetivos (se desbloquean tras Capa 2)
-  { id: 11, label: "Adj — emociones",        nivel: 1, cards: ADJECTIVES.slice(0, 6),    requires: [3] },
-  { id: 12, label: "Adj — estado 1",         nivel: 1, cards: ADJECTIVES.slice(6, 12),   requires: [11] },
-  { id: 13, label: "Adj — estado 2",         nivel: 1, cards: ADJECTIVES.slice(12, 18),  requires: [12] },
-  { id: 14, label: "Adj — descripción 1",    nivel: 1, cards: ADJECTIVES.slice(18, 25),  requires: [13] },
+  { id: 11, label: "Adj — emociones",        nivel: 1, cards: ADJECTIVES.slice(0, 8),    requires: [3] },
+  { id: 12, label: "Adj — estado 1",         nivel: 1, cards: ADJECTIVES.slice(8, 14),   requires: [11] },
+  { id: 13, label: "Adj — estado 2",         nivel: 1, cards: ADJECTIVES.slice(14, 20),  requires: [12] },
+  { id: 14, label: "Adj — descripción 1",    nivel: 1, cards: ADJECTIVES.slice(20, 25),  requires: [13] },
   { id: 15, label: "Adj — descripción 2",    nivel: 1, cards: ADJECTIVES.slice(25),      requires: [14] },
 
   // NIVEL 2 — Repasos por categoría

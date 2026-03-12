@@ -89,10 +89,11 @@ export const FRASES_POR_LOTE = {
 
   // ── Lote 11 — Adj emociones ──────────────────────────────────────────────
   11: [
+    { he: "הוּא שָׂמֵחַ",         tr: "hu sameaj",      es: "él está feliz" },
     { he: "הִיא שְׂמֵחָה",        tr: "hi smeja",       es: "ella está feliz" },
-    { he: "הוּא חָזָק",           tr: "hu jazak",       es: "él es fuerte" },
-    { he: "הַבַּיִת קָרוֹב",      tr: "habayt karov",   es: "la casa está cerca" },
+    { he: "הוּא עָצוּב",          tr: "hu atzuv",       es: "él está triste" },
     { he: "הִיא עֲצוּבָה",        tr: "hi atzuba",      es: "ella está triste" },
+    { he: "הַבַּיִת קָרוֹב",      tr: "habayt karov",   es: "la casa está cerca" },
   ],
 
   // ── Lote 12 — Adj estado 1 (viejo, nuevo, dormido/a/os/as) ───────────────
@@ -101,7 +102,7 @@ export const FRASES_POR_LOTE = {
     { he: "הוּא יָשֵׁן",          tr: "hu yashen",       es: "él está dormido" },
     { he: "הִיא יְשֵׁנָה",        tr: "hi yeshena",      es: "ella está dormida" },
     { he: "הַבַּיִת יָשָׁן",      tr: "habayt yashan",   es: "la casa es vieja" },
-    { he: "אֲנַחְנוּ יְשֵׁנִים",  tr: "anajnu yeshenim", es: "nosotros estamos dormidos" },
+    { he: "הוּא יָשֵׁן וְהִיא עֵרָה", tr: "hu yashen vehi era", es: "él está dormido y ella despierta" },
   ],
 
   // ── Lote 13 — Adj estado 2 (despierto/a, libre, ocupado) ─────────────────
