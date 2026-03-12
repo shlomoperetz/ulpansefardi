@@ -61,7 +61,7 @@ export default function App() {
         </div>
       </nav>
       {page === "home" && <Landing t={t} onNavigate={handleNavigate} />}
-      {page === "anki" && <div style={{ paddingTop: 24 }}><Anki t={t} loteId={activeLote} onBack={() => setPage("home")} /></div>}
+      {page === "anki" && <div style={{ paddingTop: 24 }}><Anki t={t} loteId={activeLote} onBack={(nextId) => { if (nextId) { setActiveLote(nextId); } else { setPage("home"); } }} /></div>}
       {page === "lilmod" && <div style={{ paddingTop: 24 }}><Lilmod t={t} loteId={activeLote} onBack={() => setPage("home")} /></div>}
       {page === "elemental" && <div style={{ paddingTop: 0 }}><Elemental t={t} onBack={() => setPage("home")} /></div>}
     </div>
