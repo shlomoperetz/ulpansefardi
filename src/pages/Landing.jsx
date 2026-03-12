@@ -5,6 +5,7 @@ import { ALL_CARDS, LOTES } from "../data/cards";
 
 export default function Landing({ t, onNavigate }) {
   const [showLotes, setShowLotes] = useState(false);
+  const [showLilmod, setShowLilmod] = useState(false);
   const progress = getProgress();
   const mastered = Object.values(progress.cards).filter(c => c.mastered).length;
   const pct = Math.round((mastered / ALL_CARDS.length) * 100);
@@ -112,6 +113,54 @@ export default function Landing({ t, onNavigate }) {
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                   {LOTES.filter(l => l.nivel === n.nivel).map(l => <LoteBtn key={l.id} lote={l} />)}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <button onClick={() => setShowLilmod(v => !v)} style={{
+          width: "100%", background: t.card, border: "1px solid " + t.border,
+          borderRadius: 14, padding: "20px 24px", cursor: "pointer",
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          fontFamily: fonts.serif, color: t.text, marginBottom: 12, marginTop: 8,
+        }}>
+          <div style={{ textAlign: "left" }}>
+            <div style={{ fontSize: 20, color: t.gold }}>לִלְמֹד <span style={{ fontSize: 11, color: t.muted }}>lilmod</span></div>
+            <div style={{ fontSize: 15, fontWeight: "bold", marginTop: 4 }}>Aprender</div>
+            <div style={{ fontSize: 12, color: t.muted, marginTop: 2, fontFamily: fonts.ui }}>Estudia las palabras antes de repasar</div>
+          </div>
+          <div style={{ fontSize: 20, color: t.gold }}>{showLilmod ? "↑" : "↓"}</div>
+        </button>
+
+        {showLilmod && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 20, marginBottom: 16 }}>
+            {niveles.map(n => (
+              <div key={n.nivel}>
+                <div style={{ fontSize: 11, color: t.muted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 8, paddingLeft: 4, fontFamily: fonts.ui }}>
+                  {n.label}
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {LOTES.filter(l => l.nivel === n.nivel).map(l => (
+                    <div
+                      key={l.id}
+                      onClick={() => onNavigate("lilmod", l.id)}
+                      style={{
+                        background: t.card, borderRadius: 12, padding: "14px 18px",
+                        border: "1px solid " + t.border, cursor: "pointer",
+                        display: "flex", alignItems: "center", justifyContent: "space-between",
+                        transition: "border-color 0.2s",
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.borderColor = t.gold}
+                      onMouseLeave={e => e.currentTarget.style.borderColor = t.border}
+                    >
+                      <div>
+                        <div style={{ fontSize: 14, color: t.text }}>{l.label}</div>
+                        <div style={{ fontSize: 11, color: t.muted, marginTop: 2, fontFamily: fonts.ui }}>{l.cards.length} palabras</div>
+                      </div>
+                      <div style={{ fontSize: 16, color: t.muted }}>→</div>
+                    </div>
+                  ))}
                 </div>
               </div>
             ))}
