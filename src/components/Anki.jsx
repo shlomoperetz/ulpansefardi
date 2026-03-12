@@ -201,6 +201,9 @@ export default function Anki({ t, loteId, onBack }) {
             <div style={{ fontSize: 13, padding: "6px 20px", borderRadius: 20, border: "1px solid", letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui, background: feedback === "correct" ? t.correct + "22" : t.wrong + "22", color: feedback === "correct" ? t.correct : t.wrong, borderColor: feedback === "correct" ? t.correct + "55" : t.wrong + "55" }}>
               {feedback === "correct" ? "correcto" : "incorrecto"}
             </div>
+            {feedback === "correct" && current?.tr && (
+              <span style={{ fontSize: 13, color: t.muted, fontStyle: "italic", fontFamily: fonts.ui }}>{current.tr}</span>
+            )}
             {feedback === "wrong" && (
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, padding: "16px 24px", background: t.bg, borderRadius: 10, width: "100%", textAlign: "center" }}>
                 <div style={{ width: "100%" }}>
