@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { LOTES, BINYAN_COLORS } from "../data/cards";
+import { FRASES_POR_LOTE } from "../data/frases";
 import { fonts } from "../theme";
 
 export default function Lilmod({ t, loteId, onBack }) {
@@ -80,6 +81,23 @@ export default function Lilmod({ t, loteId, onBack }) {
           </button>
         )}
       </div>
+
+      {isLast && revealed && FRASES_POR_LOTE[loteId] && (
+        <div style={{ marginTop: 28, borderTop: "1px solid " + t.border, paddingTop: 20 }}>
+          <div style={{ fontSize: 11, color: t.muted, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui, marginBottom: 14, textAlign: "center" }}>
+            con estas palabras puedes decir
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {FRASES_POR_LOTE[loteId].map((f, i) => (
+              <div key={i} style={{ background: t.card, borderRadius: 12, padding: "14px 20px", borderLeft: "3px solid " + t.gold + "55" }}>
+                <div style={{ fontSize: 20, fontWeight: "bold", direction: "rtl", color: t.text, lineHeight: 1.4 }}>{f.he}</div>
+                <div style={{ fontSize: 11, color: t.muted, fontStyle: "italic", fontFamily: fonts.ui, marginTop: 3 }}>{f.tr}</div>
+                <div style={{ fontSize: 13, color: t.muted, fontFamily: fonts.ui, marginTop: 5 }}>{f.es}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
