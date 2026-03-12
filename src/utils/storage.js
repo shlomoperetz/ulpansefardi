@@ -1,4 +1,4 @@
-const KEY = "ulpan_progress";
+const KEY = "ulpan_progress_v3";
 
 function load() {
   try {

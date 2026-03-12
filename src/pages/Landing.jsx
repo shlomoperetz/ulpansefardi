@@ -13,9 +13,10 @@ export default function Landing({ t, onNavigate }) {
   const practicedToday = progress.lastSession === today;
 
   const niveles = [
-    { nivel: 1, label: "Nivel 1 — Lotes base" },
-    { nivel: 2, label: "Nivel 2 — Repaso por categoria" },
-    { nivel: 3, label: "Nivel 3 — Repaso final" },
+    { nivel: 0, label: "Núcleo — palabras ancla" },
+    { nivel: 1, label: "Verbos y adjetivos" },
+    { nivel: 2, label: "Repaso por categoría" },
+    { nivel: 3, label: "Repaso final" },
   ];
 
   function loteStatus(lote) {
