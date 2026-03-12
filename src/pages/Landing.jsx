@@ -3,6 +3,7 @@ import { fonts } from "../theme";
 import { getProgress, isLoteUnlocked } from "../utils/storage";
 import { ALL_CARDS, LOTES } from "../data/cards";
 import { FRASES_POR_LOTE } from "../data/frases";
+import { BLOQUES_ALEFATO } from "../data/alefato";
 
 export default function Landing({ t, onNavigate }) {
   const [showLotes, setShowLotes] = useState(false);
@@ -124,63 +125,31 @@ export default function Landing({ t, onNavigate }) {
 
       <div style={{ maxWidth: 560, margin: "0 auto", padding: "0 24px 80px" }}>
 
-        {/* ── Frases que puedes decir ── */}
-        {sectionBtn(
-          () => setShowFrases(v => !v),
-          "מִשְׁפָּטִים", "mishpatim",
-          "Frases que puedes decir",
-          frasesDesbloqueadas.length > 0
-            ? `${frasesDesbloqueadas.length} frases desbloqueadas`
-            : "Completa lotes para desbloquear frases",
-          showFrases
-        )}
-
-        {showFrases && (
-          <div style={{ marginBottom: 16 }}>
-            {frasesDesbloqueadas.length === 0 ? (
-              <div style={{ padding: "24px", textAlign: "center", color: t.muted, fontSize: 13, fontFamily: fonts.ui, background: t.card, borderRadius: 12 }}>
-                <div style={{ fontSize: 28, marginBottom: 8 }}>🌱</div>
-                Completa la Capa 0 y sigue adelante — las primeras frases aparecerán pronto.
-              </div>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {frasesDesbloqueadas.map((f, i) => (
-                  <div key={i} style={{ background: t.card, borderRadius: 12, padding: "14px 20px", borderLeft: "3px solid " + t.gold + "55" }}>
-                    <div style={{ fontSize: 20, fontWeight: "bold", direction: "rtl", color: t.text, lineHeight: 1.4 }}>{f.he}</div>
-                    <div style={{ fontSize: 11, color: t.muted, fontStyle: "italic", fontFamily: fonts.ui, marginTop: 3 }}>{f.tr}</div>
-                    <div style={{ fontSize: 13, color: t.muted, fontFamily: fonts.ui, marginTop: 5 }}>{f.es}</div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* ── Jazara (repaso) ── */}
-        {sectionBtn(
-          () => setShowLotes(v => !v),
-          "חֲזָרָה", "jazara",
-          "Tarjetas de repaso",
-          `${Object.keys(progress.loteDone).length}/${LOTES.length} lotes completados`,
-          showLotes
-        )}
-
-        {showLotes && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 20, marginBottom: 16 }}>
-            {niveles.map(n => (
-              <div key={n.nivel}>
-                <div style={{ fontSize: 11, color: t.muted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 8, paddingLeft: 4, fontFamily: fonts.ui }}>
-                  {n.label}
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  {LOTES.filter(l => l.nivel === n.nivel).map(l => <LoteBtn key={l.id} lote={l} />)}
+        {/* ── 1. Nivel Elemental ── */}
+        {(() => {
+          const doneCount = BLOQUES_ALEFATO.filter(b => progress.elementalDone?.[b.id]).length;
+          const allDone = doneCount === BLOQUES_ALEFATO.length;
+          return (
+            <button onClick={() => onNavigate("elemental")} style={{
+              width: "100%", background: t.card,
+              border: "1px solid " + (allDone ? t.gold : t.border),
+              borderRadius: 14, padding: "20px 24px", cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+              fontFamily: fonts.serif, color: t.text, marginBottom: 12,
+            }}>
+              <div style={{ textAlign: "left" }}>
+                <div style={{ fontSize: 20, color: t.gold }}>אָלֶפְבֵּית <span style={{ fontSize: 11, color: t.muted }}>alefbeit</span></div>
+                <div style={{ fontSize: 15, fontWeight: "bold", marginTop: 4 }}>Nivel Elemental</div>
+                <div style={{ fontSize: 12, color: t.muted, marginTop: 2, fontFamily: fonts.ui }}>
+                  {doneCount}/{BLOQUES_ALEFATO.length} bloques · letras, nikud y primeras palabras
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+              <div style={{ fontSize: 20, color: allDone ? t.gold : t.muted }}>{allDone ? "✦" : "→"}</div>
+            </button>
+          );
+        })()}
 
-        {/* ── Lilmod (aprender) ── */}
+        {/* ── 2. Lilmod (aprender) ── */}
         {sectionBtn(
           () => setShowLilmod(v => !v),
           "לִלְמֹד", "lilmod",
@@ -223,22 +192,63 @@ export default function Landing({ t, onNavigate }) {
           </div>
         )}
 
-        {/* ── Alefato (nivel elemental) ── */}
-        <button onClick={() => onNavigate("elemental")} style={{
-          width: "100%", background: t.card, border: "1px solid " + t.border,
-          borderRadius: 14, padding: "20px 24px", cursor: "pointer",
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-          fontFamily: fonts.serif, color: t.text, marginBottom: 12,
-        }}>
-          <div style={{ textAlign: "left" }}>
-            <div style={{ fontSize: 20, color: t.gold }}>אָלֶפְבֵּית <span style={{ fontSize: 11, color: t.muted }}>alefbeit</span></div>
-            <div style={{ fontSize: 15, fontWeight: "bold", marginTop: 4 }}>Nivel Elemental</div>
-            <div style={{ fontSize: 12, color: t.muted, marginTop: 2, fontFamily: fonts.ui }}>Letras, nikud y primeras palabras</div>
-          </div>
-          <div style={{ fontSize: 20, color: t.gold }}>→</div>
-        </button>
+        {/* ── 3. Jazara (repaso) ── */}
+        {sectionBtn(
+          () => setShowLotes(v => !v),
+          "חֲזָרָה", "jazara",
+          "Tarjetas de repaso",
+          `${Object.keys(progress.loteDone).length}/${LOTES.length} lotes completados`,
+          showLotes
+        )}
 
-        {/* ── Dikduk (próximamente) ── */}
+        {showLotes && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 20, marginBottom: 16 }}>
+            {niveles.map(n => (
+              <div key={n.nivel}>
+                <div style={{ fontSize: 11, color: t.muted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 8, paddingLeft: 4, fontFamily: fonts.ui }}>
+                  {n.label}
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {LOTES.filter(l => l.nivel === n.nivel).map(l => <LoteBtn key={l.id} lote={l} />)}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ── 4. Mishpatim (frases) ── */}
+        {sectionBtn(
+          () => setShowFrases(v => !v),
+          "מִשְׁפָּטִים", "mishpatim",
+          "Frases que puedes decir",
+          frasesDesbloqueadas.length > 0
+            ? `${frasesDesbloqueadas.length} frases desbloqueadas`
+            : "Completa lotes para desbloquear frases",
+          showFrases
+        )}
+
+        {showFrases && (
+          <div style={{ marginBottom: 16 }}>
+            {frasesDesbloqueadas.length === 0 ? (
+              <div style={{ padding: "24px", textAlign: "center", color: t.muted, fontSize: 13, fontFamily: fonts.ui, background: t.card, borderRadius: 12 }}>
+                <div style={{ fontSize: 28, marginBottom: 8 }}>🌱</div>
+                Completa la Capa 0 y sigue adelante — las primeras frases aparecerán pronto.
+              </div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                {frasesDesbloqueadas.map((f, i) => (
+                  <div key={i} style={{ background: t.card, borderRadius: 12, padding: "14px 20px", borderLeft: "3px solid " + t.gold + "55" }}>
+                    <div style={{ fontSize: 20, fontWeight: "bold", direction: "rtl", color: t.text, lineHeight: 1.4 }}>{f.he}</div>
+                    <div style={{ fontSize: 11, color: t.muted, fontStyle: "italic", fontFamily: fonts.ui, marginTop: 3 }}>{f.tr}</div>
+                    <div style={{ fontSize: 13, color: t.muted, fontFamily: fonts.ui, marginTop: 5 }}>{f.es}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── 5. Dikduk (próximamente) ── */}
         <div style={{ background: t.card, border: "1px solid " + t.border, borderRadius: 14, padding: "20px 24px", opacity: 0.45, marginTop: 8 }}>
           <div style={{ fontSize: 20, color: t.gold }}>דִּקְדּוּק <span style={{ fontSize: 11, color: t.muted }}>dikduk</span></div>
           <div style={{ fontSize: 15, fontWeight: "bold", marginTop: 4 }}>Gramatica</div>

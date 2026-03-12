@@ -14,6 +14,7 @@ function save(data) {
 const DEFAULTS = {
   cards: {},
   loteDone: {},
+  elementalDone: {},
   streak: 0,
   lastSession: null,
   currentLote: 1,
@@ -57,6 +58,17 @@ export function markTodayDone() {
   p.streak = p.lastSession === yesterday ? p.streak + 1 : 1;
   p.lastSession = today;
   save(p);
+}
+
+export function markElementalDone(bloqueId) {
+  const p = getProgress();
+  p.elementalDone[bloqueId] = true;
+  save(p);
+}
+
+export function isElementalUnlocked(bloque, elementalDone) {
+  if (!bloque.requires) return true;
+  return bloque.requires.every(id => elementalDone[id]);
 }
 
 export function resetProgress() {

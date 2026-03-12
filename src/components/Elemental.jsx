@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect } from "react";
 import { fonts } from "../theme";
-import { LETRAS_BASICAS, NIKUD_COMBOS, PALABRAS_PUENTE } from "../data/alefato";
+import { BLOQUES_ALEFATO } from "../data/alefato";
+import { getProgress, markElementalDone, isElementalUnlocked } from "../utils/storage";
 
-// Teclado hebreo (mismo que Anki)
 const KB_ROWS = [
   ["ק","ר","א","ט","ו","ן","ם","פ"],
   ["ש","ד","ג","כ","ע","י","ח","ל","ך","ף"],
@@ -26,64 +26,111 @@ function norm(str) {
   return str.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
-// ──────────────────────────────────────────────
-// Fase A — ver y asociar (letras básicas)
-// ──────────────────────────────────────────────
-function FaseA({ t, onFinish }) {
+// ── Shared: progress bar ────────────────────────────────────────────────────
+function Bar({ t, current, total, label }) {
+  const pct = total > 0 ? Math.round((current / total) * 100) : 0;
+  return (
+    <div style={{ marginBottom: 28 }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
+        <span style={{ fontSize: 11, color: t.muted, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui }}>{label}</span>
+        <span style={{ fontSize: 13, color: t.muted, fontFamily: fonts.ui }}>{current}/{total}</span>
+      </div>
+      <div style={{ width: "100%", height: 4, background: t.surface, borderRadius: 2, overflow: "hidden" }}>
+        <div style={{ height: "100%", width: pct + "%", background: "linear-gradient(90deg," + t.gold + "," + t.goldLight + ")", borderRadius: 2, transition: "width 0.4s" }} />
+      </div>
+    </div>
+  );
+}
+
+// ── Shared: feedback card ───────────────────────────────────────────────────
+function FeedbackBlock({ t, feedback, lastInput, correct, onNext, showCorrectAlways }) {
+  return (
+    <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", gap: 12, marginTop: 8 }}>
+      <div style={{
+        fontSize: 13, padding: "6px 20px", borderRadius: 20, border: "1px solid",
+        letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui,
+        background: feedback === "correct" ? t.correct + "22" : t.wrong + "22",
+        color: feedback === "correct" ? t.correct : t.wrong,
+        borderColor: feedback === "correct" ? t.correct + "55" : t.wrong + "55",
+      }}>
+        {feedback === "correct" ? "correcto" : "incorrecto"}
+      </div>
+      {(feedback === "wrong" || showCorrectAlways) && (
+        <div style={{
+          display: "flex", flexDirection: "column", alignItems: "center", gap: 12,
+          padding: "16px 24px", background: t.bg, borderRadius: 10, width: "100%", textAlign: "center",
+        }}>
+          {feedback === "wrong" && (
+            <div style={{ width: "100%" }}>
+              <span style={{ fontSize: 11, color: t.subtle, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui }}>Tu respuesta</span>
+              <div style={{ fontSize: 22, color: t.wrong, fontWeight: "bold", marginTop: 4, textDecoration: "line-through", opacity: 0.8, fontFamily: fonts.ui }}>
+                {lastInput || "—"}
+              </div>
+            </div>
+          )}
+          <div style={{ width: "100%", borderTop: feedback === "wrong" ? "1px solid " + t.border : "none", paddingTop: feedback === "wrong" ? 12 : 0 }}>
+            {feedback === "wrong" && <span style={{ fontSize: 11, color: t.subtle, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui }}>Correcto</span>}
+            {correct}
+          </div>
+        </div>
+      )}
+      {feedback === "wrong" && (
+        <button style={{
+          background: "none", border: "1px solid " + t.border, borderRadius: 20,
+          padding: "6px 20px", color: t.gold, fontSize: 13, cursor: "pointer", fontFamily: fonts.ui,
+        }} onClick={onNext}>Continuar</button>
+      )}
+    </div>
+  );
+}
+
+// ── Fase A — ver y asociar ──────────────────────────────────────────────────
+function FaseA({ t, items, onFinish }) {
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
-  const items = LETRAS_BASICAS;
   const item = items[index];
   const isLast = index === items.length - 1;
 
-  const btnBase = {
+  const btn = {
     flex: 1, background: t.card, border: "1px solid " + t.border, borderRadius: 10,
     padding: "12px 0", color: t.muted, fontSize: 14, fontFamily: fonts.ui, cursor: "pointer",
   };
 
   return (
-    <div style={{ maxWidth: 480, margin: "0 auto", padding: "0 16px 60px" }}>
-      <Progress t={t} current={index + 1} total={items.length} label="Fase A — ver y asociar" />
-
+    <div>
+      <Bar t={t} current={index + 1} total={items.length} label="ver y asociar" />
       <div
         onClick={() => !revealed && setRevealed(true)}
         style={{
           background: t.card, border: "1px solid " + t.border, borderRadius: 16,
-          padding: "64px 32px", textAlign: "center", cursor: revealed ? "default" : "pointer",
-          minHeight: 240, display: "flex", flexDirection: "column",
-          alignItems: "center", justifyContent: "center", gap: 16,
+          padding: "60px 32px", textAlign: "center", cursor: revealed ? "default" : "pointer",
+          minHeight: 220, display: "flex", flexDirection: "column",
+          alignItems: "center", justifyContent: "center", gap: 20,
           boxShadow: "0 8px 40px #00000014",
         }}
       >
-        <div style={{ fontSize: 96, fontWeight: "bold", direction: "rtl", lineHeight: 1, fontFamily: fonts.serif, color: t.text }}>
+        <div style={{ fontSize: 108, fontWeight: "bold", direction: "rtl", lineHeight: 1, fontFamily: fonts.serif, color: t.text }}>
           {item.he}
         </div>
-
         {revealed ? (
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-            <div style={{ fontSize: 28, color: t.gold, fontFamily: fonts.ui, letterSpacing: 2 }}>
-              {item.tr}
-            </div>
+          <div style={{ fontSize: 30, color: t.gold, fontFamily: fonts.ui, letterSpacing: 3 }}>
+            {item.tr}
           </div>
         ) : (
-          <div style={{ fontSize: 12, color: t.subtle, fontFamily: fonts.ui }}>
-            toca para ver el sonido
-          </div>
+          <div style={{ fontSize: 12, color: t.subtle, fontFamily: fonts.ui }}>toca para ver el sonido</div>
         )}
       </div>
-
       <div style={{ display: "flex", gap: 10, marginTop: 16 }}>
         <button onClick={() => { setIndex(i => i - 1); setRevealed(false); }} disabled={index === 0}
-          style={{ ...btnBase, opacity: index === 0 ? 0.3 : 1 }}>← anterior</button>
+          style={{ ...btn, opacity: index === 0 ? 0.3 : 1 }}>← anterior</button>
         {!isLast ? (
           <button onClick={() => { setIndex(i => i + 1); setRevealed(false); }}
-            style={{ ...btnBase, color: revealed ? t.gold : t.muted, borderColor: revealed ? t.gold + "66" : t.border }}>
+            style={{ ...btn, color: revealed ? t.gold : t.muted, borderColor: revealed ? t.gold + "66" : t.border }}>
             siguiente →
           </button>
         ) : (
-          <button onClick={onFinish}
-            style={{ ...btnBase, color: t.gold, borderColor: t.gold + "66" }}>
-            ✦ continuar
+          <button onClick={onFinish} style={{ ...btn, color: t.gold, borderColor: t.gold + "66" }}>
+            ✦ practicar →
           </button>
         )}
       </div>
@@ -91,39 +138,31 @@ function FaseA({ t, onFinish }) {
   );
 }
 
-// ──────────────────────────────────────────────
-// Fase B — ver sonido, escribir letra
-// ──────────────────────────────────────────────
-function FaseB({ t, onFinish }) {
-  const [items] = useState(() => shuffle(LETRAS_BASICAS));
+// ── Fase B — ver sonido, escribir letra ────────────────────────────────────
+function FaseB({ t, items, onFinish }) {
+  const [queue, setQueue] = useState(() => shuffle(items));
   const [index, setIndex] = useState(0);
-  const [mastered, setMastered] = useState(() => new Set());
+  const [done, setDone] = useState(() => new Set());
   const [input, setInput] = useState("");
-  const [feedback, setFeedback] = useState(null); // null | "correct" | "wrong"
-  const [showKb, setShowKb] = useState(true);
+  const [feedback, setFeedback] = useState(null);
   const [lastInput, setLastInput] = useState("");
+  const [showKb, setShowKb] = useState(true);
   const inputRef = useRef(null);
 
-  const active = items.filter((_, i) => !mastered.has(i));
+  const active = queue.filter((_, i) => !done.has(i));
   const current = active[index % Math.max(active.length, 1)];
-  const currentOrigIdx = items.indexOf(current);
+  const origIdx = queue.indexOf(current);
 
   useEffect(() => { if (!feedback) inputRef.current?.focus(); }, [feedback, index]);
-
-  useEffect(() => {
-    if (active.length === 0 && items.length > 0) onFinish();
-  }, [active.length]);
+  useEffect(() => { if (active.length === 0 && queue.length > 0) onFinish(); }, [active.length]);
 
   function submit() {
     if (!current || feedback) return;
     setLastInput(input);
-    const typed = stripNikud(input.trim());
-    const expected = stripNikud(current.he);
-    const ok = typed === expected;
-
+    const ok = stripNikud(input.trim()) === stripNikud(current.he);
     if (ok) {
       setFeedback("correct");
-      setMastered(prev => new Set([...prev, currentOrigIdx]));
+      setDone(prev => new Set([...prev, origIdx]));
       setTimeout(() => { setFeedback(null); setInput(""); setIndex(i => i + 1); }, 900);
     } else {
       setFeedback("wrong");
@@ -141,17 +180,14 @@ function FaseB({ t, onFinish }) {
     display: "flex", alignItems: "center", justifyContent: "center", padding: 0,
   };
 
-  const pct = Math.round((mastered.size / items.length) * 100);
-
   return (
-    <div style={{ maxWidth: 480, margin: "0 auto", padding: "0 16px 60px" }}>
-      <Progress t={t} current={mastered.size} total={items.length} label="Fase B — escribe la letra" pct={pct} />
-
+    <div>
+      <Bar t={t} current={done.size} total={queue.length} label="escribe la letra" />
       <div style={{
         background: t.card,
         border: "1px solid " + (feedback === "correct" ? t.correct : feedback === "wrong" ? t.wrong : t.border),
-        borderRadius: 16, padding: "36px 32px",
-        display: "flex", flexDirection: "column", alignItems: "center", gap: 16,
+        borderRadius: 16, padding: "32px 28px",
+        display: "flex", flexDirection: "column", alignItems: "center", gap: 14,
         transition: "border-color 0.3s", boxShadow: "0 8px 40px #00000022",
       }}>
         <div style={{ fontSize: 11, color: t.subtle, letterSpacing: 1, textTransform: "uppercase", alignSelf: "flex-end", fontFamily: fonts.ui }}>
@@ -160,13 +196,13 @@ function FaseB({ t, onFinish }) {
         <div style={{ fontSize: 12, color: t.muted, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui }}>
           ¿cuál es la letra?
         </div>
-        <div style={{ fontSize: 40, color: t.gold, fontFamily: fonts.ui, letterSpacing: 4, fontWeight: "bold" }}>
+        <div style={{ fontSize: 44, color: t.gold, fontFamily: fonts.ui, letterSpacing: 4, fontWeight: "bold" }}>
           {current?.tr}
         </div>
 
         {!feedback ? (
           <>
-            <div style={{ display: "flex", width: "100%", gap: 8, marginTop: 8 }}>
+            <div style={{ display: "flex", width: "100%", gap: 8, marginTop: 4 }}>
               <input
                 ref={inputRef} value={input}
                 onChange={e => setInput(e.target.value)}
@@ -174,10 +210,10 @@ function FaseB({ t, onFinish }) {
                 style={{
                   flex: 1, background: t.bg, border: "1px solid " + t.border,
                   borderRadius: 10, padding: "12px 16px", color: t.text,
-                  fontSize: 28, fontFamily: fonts.serif, outline: "none",
+                  fontSize: 32, fontFamily: fonts.serif, outline: "none",
                   direction: "rtl", textAlign: "center",
                 }}
-                placeholder="א" autoComplete="off" autoCorrect="off" spellCheck="false" dir="rtl"
+                autoComplete="off" autoCorrect="off" spellCheck="false" dir="rtl"
               />
               <button onClick={submit} style={{
                 background: t.gold, border: "none", borderRadius: 10,
@@ -211,75 +247,43 @@ function FaseB({ t, onFinish }) {
             )}
           </>
         ) : (
-          <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", gap: 12, marginTop: 8 }}>
-            <div style={{
-              fontSize: 13, padding: "6px 20px", borderRadius: 20, border: "1px solid",
-              letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui,
-              background: feedback === "correct" ? t.correct + "22" : t.wrong + "22",
-              color: feedback === "correct" ? t.correct : t.wrong,
-              borderColor: feedback === "correct" ? t.correct + "55" : t.wrong + "55",
-            }}>
-              {feedback === "correct" ? "correcto" : "incorrecto"}
-            </div>
-            {feedback === "wrong" && (
-              <div style={{
-                display: "flex", flexDirection: "column", alignItems: "center", gap: 12,
-                padding: "16px 24px", background: t.bg, borderRadius: 10, width: "100%", textAlign: "center",
-              }}>
-                <div style={{ width: "100%" }}>
-                  <span style={{ fontSize: 11, color: t.subtle, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui }}>Tu respuesta</span>
-                  <div style={{ fontSize: 36, color: t.wrong, fontWeight: "bold", direction: "rtl", marginTop: 4, textDecoration: "line-through", opacity: 0.8, fontFamily: fonts.serif }}>
-                    {lastInput || "—"}
-                  </div>
-                </div>
-                <div style={{ width: "100%", borderTop: "1px solid " + t.border, paddingTop: 12 }}>
-                  <span style={{ fontSize: 11, color: t.subtle, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui }}>Correcto</span>
-                  <div style={{ fontSize: 64, color: t.text, fontWeight: "bold", direction: "rtl", marginTop: 4, fontFamily: fonts.serif }}>
-                    {current?.he}
-                  </div>
-                </div>
+          <FeedbackBlock t={t} feedback={feedback} lastInput={lastInput} onNext={next}
+            correct={
+              <div style={{ fontSize: 80, color: t.text, fontWeight: "bold", direction: "rtl", marginTop: 4, fontFamily: fonts.serif }}>
+                {current?.he}
               </div>
-            )}
-            {feedback === "wrong" && (
-              <button style={{
-                background: "none", border: "1px solid " + t.border, borderRadius: 20,
-                padding: "6px 20px", color: t.gold, fontSize: 13, cursor: "pointer", fontFamily: fonts.ui,
-              }} onClick={next}>Continuar</button>
-            )}
-          </div>
+            }
+          />
         )}
       </div>
     </div>
   );
 }
 
-// ──────────────────────────────────────────────
-// Fase C — letra+nikud → transliteración
-// ──────────────────────────────────────────────
-function FaseC({ t, onFinish }) {
-  const [items] = useState(() => shuffle(NIKUD_COMBOS));
+// ── Fase C — letra+nikud → transliteración ─────────────────────────────────
+function FaseC({ t, items, onFinish }) {
+  const [queue] = useState(() => shuffle(items));
   const [index, setIndex] = useState(0);
-  const [mastered, setMastered] = useState(() => new Set());
+  const [done, setDone] = useState(() => new Set());
   const [input, setInput] = useState("");
   const [feedback, setFeedback] = useState(null);
   const [lastInput, setLastInput] = useState("");
   const inputRef = useRef(null);
 
-  const active = items.filter((_, i) => !mastered.has(i));
+  const active = queue.filter((_, i) => !done.has(i));
   const current = active[index % Math.max(active.length, 1)];
-  const currentOrigIdx = items.indexOf(current);
+  const origIdx = queue.indexOf(current);
 
   useEffect(() => { if (!feedback) inputRef.current?.focus(); }, [feedback, index]);
-  useEffect(() => { if (active.length === 0 && items.length > 0) onFinish(); }, [active.length]);
+  useEffect(() => { if (active.length === 0 && queue.length > 0) onFinish(); }, [active.length]);
 
   function submit() {
     if (!current || feedback) return;
     setLastInput(input);
     const ok = norm(input) === norm(current.tr) || (current.tr === "" && input.trim() === "");
-
     if (ok) {
       setFeedback("correct");
-      setMastered(prev => new Set([...prev, currentOrigIdx]));
+      setDone(prev => new Set([...prev, origIdx]));
       setTimeout(() => { setFeedback(null); setInput(""); setIndex(i => i + 1); }, 900);
     } else {
       setFeedback("wrong");
@@ -288,17 +292,14 @@ function FaseC({ t, onFinish }) {
 
   function next() { setFeedback(null); setInput(""); setIndex(i => i + 1); }
 
-  const pct = Math.round((mastered.size / items.length) * 100);
-
   return (
-    <div style={{ maxWidth: 480, margin: "0 auto", padding: "0 16px 60px" }}>
-      <Progress t={t} current={mastered.size} total={items.length} label="Fase C — letra + nikud" pct={pct} />
-
+    <div>
+      <Bar t={t} current={done.size} total={queue.length} label="¿cómo suena?" />
       <div style={{
         background: t.card,
         border: "1px solid " + (feedback === "correct" ? t.correct : feedback === "wrong" ? t.wrong : t.border),
-        borderRadius: 16, padding: "36px 32px",
-        display: "flex", flexDirection: "column", alignItems: "center", gap: 16,
+        borderRadius: 16, padding: "32px 28px",
+        display: "flex", flexDirection: "column", alignItems: "center", gap: 14,
         transition: "border-color 0.3s", boxShadow: "0 8px 40px #00000022",
       }}>
         <div style={{ fontSize: 11, color: t.subtle, letterSpacing: 1, textTransform: "uppercase", alignSelf: "flex-end", fontFamily: fonts.ui }}>
@@ -307,7 +308,7 @@ function FaseC({ t, onFinish }) {
         <div style={{ fontSize: 12, color: t.muted, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui }}>
           ¿cómo suena?
         </div>
-        <div style={{ fontSize: 80, fontWeight: "bold", direction: "rtl", lineHeight: 1.2, fontFamily: fonts.serif, color: t.text }}>
+        <div style={{ fontSize: 88, fontWeight: "bold", direction: "rtl", lineHeight: 1.2, fontFamily: fonts.serif, color: t.text }}>
           {current?.he}
         </div>
         {current?.nota && (
@@ -315,7 +316,7 @@ function FaseC({ t, onFinish }) {
         )}
 
         {!feedback ? (
-          <div style={{ display: "flex", width: "100%", gap: 8, marginTop: 8 }}>
+          <div style={{ display: "flex", width: "100%", gap: 8, marginTop: 4 }}>
             <input
               ref={inputRef} value={input}
               onChange={e => setInput(e.target.value)}
@@ -325,7 +326,7 @@ function FaseC({ t, onFinish }) {
                 borderRadius: 10, padding: "12px 16px", color: t.text,
                 fontSize: 18, fontFamily: fonts.ui, outline: "none",
               }}
-              placeholder={current?.tr === "" ? "shva — escribe nada y pulsa →" : "escribe la transliteración..."}
+              placeholder={current?.tr === "" ? "shva mudo — pulsa → sin escribir" : "escribe la transliteración..."}
               autoComplete="off" autoCorrect="off" spellCheck="false"
             />
             <button onClick={submit} style={{
@@ -334,75 +335,43 @@ function FaseC({ t, onFinish }) {
             }}>→</button>
           </div>
         ) : (
-          <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", gap: 12, marginTop: 8 }}>
-            <div style={{
-              fontSize: 13, padding: "6px 20px", borderRadius: 20, border: "1px solid",
-              letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui,
-              background: feedback === "correct" ? t.correct + "22" : t.wrong + "22",
-              color: feedback === "correct" ? t.correct : t.wrong,
-              borderColor: feedback === "correct" ? t.correct + "55" : t.wrong + "55",
-            }}>
-              {feedback === "correct" ? "correcto" : "incorrecto"}
-            </div>
-            {feedback === "wrong" && (
-              <div style={{
-                display: "flex", flexDirection: "column", alignItems: "center", gap: 12,
-                padding: "16px 24px", background: t.bg, borderRadius: 10, width: "100%", textAlign: "center",
-              }}>
-                <div style={{ width: "100%" }}>
-                  <span style={{ fontSize: 11, color: t.subtle, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui }}>Tu respuesta</span>
-                  <div style={{ fontSize: 22, color: t.wrong, fontWeight: "bold", marginTop: 4, textDecoration: "line-through", opacity: 0.8, fontFamily: fonts.ui }}>
-                    {lastInput || "—"}
-                  </div>
-                </div>
-                <div style={{ width: "100%", borderTop: "1px solid " + t.border, paddingTop: 12 }}>
-                  <span style={{ fontSize: 11, color: t.subtle, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui }}>Correcto</span>
-                  <div style={{ fontSize: 28, color: t.gold, fontWeight: "bold", marginTop: 4, fontFamily: fonts.ui, letterSpacing: 2 }}>
-                    {current?.tr || "(shva mudo)"}
-                  </div>
-                </div>
+          <FeedbackBlock t={t} feedback={feedback} lastInput={lastInput} onNext={next}
+            correct={
+              <div style={{ fontSize: 32, color: t.gold, fontWeight: "bold", marginTop: 4, fontFamily: fonts.ui, letterSpacing: 2 }}>
+                {current?.tr || "(mudo)"}
               </div>
-            )}
-            {feedback === "wrong" && (
-              <button style={{
-                background: "none", border: "1px solid " + t.border, borderRadius: 20,
-                padding: "6px 20px", color: t.gold, fontSize: 13, cursor: "pointer", fontFamily: fonts.ui,
-              }} onClick={next}>Continuar</button>
-            )}
-          </div>
+            }
+          />
         )}
       </div>
     </div>
   );
 }
 
-// ──────────────────────────────────────────────
-// Fase D — palabras puente
-// ──────────────────────────────────────────────
-function FaseD({ t, onFinish }) {
-  const [items] = useState(() => shuffle(PALABRAS_PUENTE));
+// ── Fase D — palabras puente ────────────────────────────────────────────────
+function FaseD({ t, items, onFinish }) {
+  const [queue] = useState(() => shuffle(items));
   const [index, setIndex] = useState(0);
-  const [mastered, setMastered] = useState(() => new Set());
+  const [done, setDone] = useState(() => new Set());
   const [input, setInput] = useState("");
   const [feedback, setFeedback] = useState(null);
   const [lastInput, setLastInput] = useState("");
   const inputRef = useRef(null);
 
-  const active = items.filter((_, i) => !mastered.has(i));
+  const active = queue.filter((_, i) => !done.has(i));
   const current = active[index % Math.max(active.length, 1)];
-  const currentOrigIdx = items.indexOf(current);
+  const origIdx = queue.indexOf(current);
 
   useEffect(() => { if (!feedback) inputRef.current?.focus(); }, [feedback, index]);
-  useEffect(() => { if (active.length === 0 && items.length > 0) onFinish(); }, [active.length]);
+  useEffect(() => { if (active.length === 0 && queue.length > 0) onFinish(); }, [active.length]);
 
   function submit() {
     if (!current || feedback) return;
     setLastInput(input);
     const ok = norm(input) === norm(current.tr);
-
     if (ok) {
       setFeedback("correct");
-      setMastered(prev => new Set([...prev, currentOrigIdx]));
+      setDone(prev => new Set([...prev, origIdx]));
       setTimeout(() => { setFeedback(null); setInput(""); setIndex(i => i + 1); }, 900);
     } else {
       setFeedback("wrong");
@@ -411,17 +380,14 @@ function FaseD({ t, onFinish }) {
 
   function next() { setFeedback(null); setInput(""); setIndex(i => i + 1); }
 
-  const pct = Math.round((mastered.size / items.length) * 100);
-
   return (
-    <div style={{ maxWidth: 480, margin: "0 auto", padding: "0 16px 60px" }}>
-      <Progress t={t} current={mastered.size} total={items.length} label="Fase D — primeras palabras" pct={pct} />
-
+    <div>
+      <Bar t={t} current={done.size} total={queue.length} label="¿cómo se lee?" />
       <div style={{
         background: t.card,
         border: "1px solid " + (feedback === "correct" ? t.correct : feedback === "wrong" ? t.wrong : t.border),
-        borderRadius: 16, padding: "36px 32px",
-        display: "flex", flexDirection: "column", alignItems: "center", gap: 16,
+        borderRadius: 16, padding: "32px 28px",
+        display: "flex", flexDirection: "column", alignItems: "center", gap: 14,
         transition: "border-color 0.3s", boxShadow: "0 8px 40px #00000022",
       }}>
         <div style={{ fontSize: 11, color: t.subtle, letterSpacing: 1, textTransform: "uppercase", alignSelf: "flex-end", fontFamily: fonts.ui }}>
@@ -430,15 +396,13 @@ function FaseD({ t, onFinish }) {
         <div style={{ fontSize: 12, color: t.muted, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui }}>
           ¿cómo se lee?
         </div>
-        <div style={{ fontSize: 56, fontWeight: "bold", direction: "rtl", lineHeight: 1.3, fontFamily: fonts.serif, color: t.text }}>
+        <div style={{ fontSize: 52, fontWeight: "bold", direction: "rtl", lineHeight: 1.3, fontFamily: fonts.serif, color: t.text }}>
           {current?.he}
         </div>
-        <div style={{ fontSize: 14, color: t.muted, fontFamily: fonts.ui }}>
-          {current?.es}
-        </div>
+        <div style={{ fontSize: 14, color: t.muted, fontFamily: fonts.ui }}>{current?.es}</div>
 
         {!feedback ? (
-          <div style={{ display: "flex", width: "100%", gap: 8, marginTop: 8 }}>
+          <div style={{ display: "flex", width: "100%", gap: 8, marginTop: 4 }}>
             <input
               ref={inputRef} value={input}
               onChange={e => setInput(e.target.value)}
@@ -456,187 +420,160 @@ function FaseD({ t, onFinish }) {
             }}>→</button>
           </div>
         ) : (
-          <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", gap: 12, marginTop: 8 }}>
-            <div style={{
-              fontSize: 13, padding: "6px 20px", borderRadius: 20, border: "1px solid",
-              letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui,
-              background: feedback === "correct" ? t.correct + "22" : t.wrong + "22",
-              color: feedback === "correct" ? t.correct : t.wrong,
-              borderColor: feedback === "correct" ? t.correct + "55" : t.wrong + "55",
-            }}>
-              {feedback === "correct" ? "correcto" : "incorrecto"}
-            </div>
-            {feedback === "correct" && (
-              <div style={{ fontSize: 16, color: t.gold, fontFamily: fonts.ui, letterSpacing: 2 }}>
+          <FeedbackBlock t={t} feedback={feedback} lastInput={lastInput} onNext={next}
+            showCorrectAlways
+            correct={
+              <div style={{ fontSize: 28, color: t.gold, fontWeight: "bold", marginTop: 4, fontFamily: fonts.ui, letterSpacing: 2 }}>
                 {current?.tr}
               </div>
-            )}
-            {feedback === "wrong" && (
-              <div style={{
-                display: "flex", flexDirection: "column", alignItems: "center", gap: 12,
-                padding: "16px 24px", background: t.bg, borderRadius: 10, width: "100%", textAlign: "center",
-              }}>
-                <div style={{ width: "100%" }}>
-                  <span style={{ fontSize: 11, color: t.subtle, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui }}>Tu respuesta</span>
-                  <div style={{ fontSize: 22, color: t.wrong, fontWeight: "bold", marginTop: 4, textDecoration: "line-through", opacity: 0.8, fontFamily: fonts.ui }}>
-                    {lastInput || "—"}
-                  </div>
-                </div>
-                <div style={{ width: "100%", borderTop: "1px solid " + t.border, paddingTop: 12 }}>
-                  <span style={{ fontSize: 11, color: t.subtle, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui }}>Correcto</span>
-                  <div style={{ fontSize: 28, color: t.gold, fontWeight: "bold", marginTop: 4, fontFamily: fonts.ui, letterSpacing: 2 }}>
-                    {current?.tr}
-                  </div>
-                </div>
-              </div>
-            )}
-            {feedback === "wrong" && (
-              <button style={{
-                background: "none", border: "1px solid " + t.border, borderRadius: 20,
-                padding: "6px 20px", color: t.gold, fontSize: 13, cursor: "pointer", fontFamily: fonts.ui,
-              }} onClick={next}>Continuar</button>
-            )}
-          </div>
+            }
+          />
         )}
       </div>
     </div>
   );
 }
 
-// ──────────────────────────────────────────────
-// Barra de progreso reutilizable
-// ──────────────────────────────────────────────
-function Progress({ t, current, total, label, pct }) {
-  const p = pct !== undefined ? pct : Math.round((current / total) * 100);
+// ── Práctica de un bloque (A+B, C, o D) ────────────────────────────────────
+function BloqueSession({ t, bloque, onDone, onBack }) {
+  // letras: step "A" → "B" → done
+  // nikud / palabras: step "main" → done
+  const initStep = bloque.type === "letras" ? "A" : "main";
+  const [step, setStep] = useState(initStep);
+
+  if (bloque.type === "letras") {
+    if (step === "A") return (
+      <FaseA t={t} items={bloque.items} onFinish={() => setStep("B")} />
+    );
+    if (step === "B") return (
+      <FaseB t={t} items={bloque.items} onFinish={onDone} />
+    );
+  }
+
+  if (bloque.type === "nikud") return (
+    <FaseC t={t} items={bloque.items} onFinish={onDone} />
+  );
+
+  if (bloque.type === "palabras") return (
+    <FaseD t={t} items={bloque.items} onFinish={onDone} />
+  );
+
+  return null;
+}
+
+// ── Menú principal de bloques ───────────────────────────────────────────────
+function Menu({ t, onSelect, elementalDone }) {
   return (
-    <div style={{ marginBottom: 28 }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-        <span style={{ fontSize: 11, color: t.muted, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui }}>{label}</span>
-        <span style={{ fontSize: 13, color: t.muted, fontFamily: fonts.ui }}>{current}/{total}</span>
+    <div>
+      <div style={{ marginBottom: 20, fontSize: 13, color: t.muted, fontFamily: fonts.ui }}>
+        Completa cada bloque para desbloquear el siguiente.
       </div>
-      <div style={{ width: "100%", height: 4, background: t.surface, borderRadius: 2, overflow: "hidden" }}>
-        <div style={{ height: "100%", width: p + "%", background: "linear-gradient(90deg," + t.gold + "," + t.goldLight + ")", borderRadius: 2, transition: "width 0.4s" }} />
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {BLOQUES_ALEFATO.map(b => {
+          const done = !!elementalDone[b.id];
+          const unlocked = isElementalUnlocked(b, elementalDone);
+          const locked = !unlocked;
+          return (
+            <div
+              key={b.id}
+              onClick={() => !locked && onSelect(b)}
+              style={{
+                background: t.card, borderRadius: 12, padding: "14px 18px",
+                border: "1px solid " + (done ? t.gold : t.border),
+                cursor: locked ? "not-allowed" : "pointer",
+                opacity: locked ? 0.35 : 1,
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                transition: "border-color 0.2s",
+              }}
+              onMouseEnter={e => { if (!locked) e.currentTarget.style.borderColor = t.gold; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = done ? t.gold : t.border; }}
+            >
+              <div>
+                <div style={{ fontSize: 14, color: t.text, fontWeight: done ? "bold" : "normal" }}>{b.label}</div>
+                <div style={{ fontSize: 12, color: t.muted, marginTop: 3, direction: "rtl", fontFamily: fonts.serif }}>{b.sub}</div>
+              </div>
+              <div style={{ fontSize: 16, color: done ? t.gold : locked ? t.subtle : t.muted, flexShrink: 0, marginLeft: 12 }}>
+                {done ? "✦" : locked ? "⊗" : "→"}
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
 }
 
-// ──────────────────────────────────────────────
-// Pantalla de introducción por fase
-// ──────────────────────────────────────────────
-function Intro({ t, fase, onStart }) {
-  const info = {
-    A: {
-      title: "Fase A — Ver y asociar",
-      desc: "Verás cada letra con su sonido en transliteración. No tienes que escribir nada, solo familiarizarte.",
-      items: LETRAS_BASICAS.length + " letras",
-    },
-    B: {
-      title: "Fase B — Escribe la letra",
-      desc: "Verás el sonido y tendrás que escribir la letra hebrea correspondiente con el teclado.",
-      items: LETRAS_BASICAS.length + " letras",
-    },
-    C: {
-      title: "Fase C — Letra + nikud",
-      desc: "Verás una letra con vocales (nikud) y escribirás cómo suena en transliteración.",
-      items: NIKUD_COMBOS.length + " combinaciones",
-    },
-    D: {
-      title: "Fase D — Primeras palabras",
-      desc: "Palabras reales con nikud completo. Escribe cómo suena cada una. ¡Ya puedes leer hebreo!",
-      items: PALABRAS_PUENTE.length + " palabras",
-    },
-  }[fase];
+// ── Done screen ─────────────────────────────────────────────────────────────
+function BloqueComplete({ t, bloque, onBack }) {
+  const allDone = BLOQUES_ALEFATO.every(b => {
+    const p = getProgress();
+    return !!p.elementalDone[b.id];
+  });
 
   return (
-    <div style={{ maxWidth: 480, margin: "0 auto", padding: "40px 16px", textAlign: "center" }}>
-      <div style={{ fontSize: 48, color: t.gold, marginBottom: 16 }}>✦</div>
-      <h2 style={{ fontSize: 22, color: t.text, fontFamily: fonts.serif, margin: "0 0 12px" }}>{info.title}</h2>
-      <p style={{ fontSize: 15, color: t.muted, fontFamily: fonts.ui, lineHeight: 1.6, margin: "0 0 8px" }}>{info.desc}</p>
-      <p style={{ fontSize: 12, color: t.subtle, fontFamily: fonts.ui, marginBottom: 32 }}>{info.items}</p>
-      <button onClick={onStart} style={{
-        background: t.gold, border: "none", borderRadius: 12,
-        padding: "14px 40px", color: t.bg, fontSize: 15, fontWeight: "bold",
-        cursor: "pointer", fontFamily: fonts.ui,
-      }}>
-        Empezar →
-      </button>
-    </div>
-  );
-}
-
-// ──────────────────────────────────────────────
-// Pantalla de fin
-// ──────────────────────────────────────────────
-function Done({ t, onBack }) {
-  return (
-    <div style={{ maxWidth: 480, margin: "0 auto", padding: "60px 16px", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
-      <div style={{ fontSize: 64, color: t.gold }}>★</div>
-      <h2 style={{ fontSize: 28, color: t.text, fontFamily: fonts.serif, margin: 0 }}>Alefato completado</h2>
-      <p style={{ color: t.muted, fontFamily: fonts.ui, margin: 0, lineHeight: 1.6, maxWidth: 320 }}>
-        Ya puedes leer hebreo con nikud. Ahora empieza con las palabras del Núcleo.
-      </p>
+    <div style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 16, paddingTop: 40 }}>
+      <div style={{ fontSize: 56, color: t.gold }}>{allDone ? "★" : "✦"}</div>
+      <h2 style={{ fontSize: 24, color: t.text, fontFamily: fonts.serif, margin: 0 }}>{bloque.label} completado</h2>
+      {allDone && (
+        <p style={{ color: t.muted, fontFamily: fonts.ui, margin: 0, lineHeight: 1.6, maxWidth: 280 }}>
+          Alefato completo. Ya puedes pasar al Núcleo.
+        </p>
+      )}
       <button onClick={onBack} style={{
         background: t.gold, border: "none", borderRadius: 10,
         padding: "12px 32px", color: t.bg, fontSize: 14,
         cursor: "pointer", fontFamily: fonts.ui, marginTop: 8,
       }}>
-        Ir al Núcleo →
+        {allDone ? "Ir al Núcleo →" : "← volver"}
       </button>
     </div>
   );
 }
 
-// ──────────────────────────────────────────────
-// Componente principal
-// ──────────────────────────────────────────────
-const FASES = ["A", "B", "C", "D"];
-
+// ── Componente principal ────────────────────────────────────────────────────
 export default function Elemental({ t, onBack }) {
-  // step: "intro-A" | "A" | "intro-B" | "B" | "intro-C" | "C" | "intro-D" | "D" | "done"
-  const [step, setStep] = useState("intro-A");
+  const [activeBloque, setActiveBloque] = useState(null);
+  const [justDone, setJustDone] = useState(null);
+  const [progress, setProgress] = useState(() => getProgress());
 
-  function finishFase(fase) {
-    const next = FASES[FASES.indexOf(fase) + 1];
-    if (next) setStep("intro-" + next);
-    else setStep("done");
+  function handleDone() {
+    markElementalDone(activeBloque.id);
+    setJustDone(activeBloque);
+    setActiveBloque(null);
+    setProgress(getProgress());
   }
+
+  function handleBack() {
+    setActiveBloque(null);
+    setJustDone(null);
+  }
+
+  const doneCount = BLOQUES_ALEFATO.filter(b => progress.elementalDone[b.id]).length;
 
   return (
     <div style={{ minHeight: "100vh", background: t.bg, fontFamily: fonts.serif, color: t.text }}>
-      {/* Header */}
-      <div style={{ maxWidth: 480, margin: "0 auto", padding: "0 16px", display: "flex", justifyContent: "space-between", alignItems: "center", paddingTop: 24, paddingBottom: 8 }}>
-        <button onClick={onBack} style={{ background: "none", border: "none", color: t.muted, fontSize: 12, cursor: "pointer", fontFamily: fonts.ui }}>
-          ← volver
-        </button>
-        <span style={{ fontSize: 11, padding: "3px 12px", border: "1px solid " + t.gold + "44", borderRadius: 20, color: t.gold, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui }}>
-          Nivel Elemental
-        </span>
-        {/* Indicador de fase */}
-        <div style={{ display: "flex", gap: 4 }}>
-          {FASES.map(f => {
-            const done = FASES.indexOf(f) < FASES.indexOf(step.replace("intro-", "")) || step === "done";
-            const active = step === f || step === "intro-" + f;
-            return (
-              <div key={f} style={{
-                width: 20, height: 4, borderRadius: 2,
-                background: done ? t.gold : active ? t.gold + "88" : t.border,
-                transition: "background 0.3s",
-              }} />
-            );
-          })}
+      <div style={{ maxWidth: 480, margin: "0 auto", padding: "24px 16px 80px" }}>
+        {/* Header */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
+          <button onClick={activeBloque ? () => setActiveBloque(null) : onBack}
+            style={{ background: "none", border: "none", color: t.muted, fontSize: 12, cursor: "pointer", fontFamily: fonts.ui }}>
+            ← volver
+          </button>
+          <span style={{ fontSize: 11, padding: "3px 12px", border: "1px solid " + t.gold + "44", borderRadius: 20, color: t.gold, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui }}>
+            Nivel Elemental
+          </span>
+          <span style={{ fontSize: 13, color: t.muted, fontFamily: fonts.ui }}>{doneCount}/{BLOQUES_ALEFATO.length}</span>
         </div>
-      </div>
 
-      {step === "intro-A" && <Intro t={t} fase="A" onStart={() => setStep("A")} />}
-      {step === "A"       && <FaseA t={t} onFinish={() => finishFase("A")} />}
-      {step === "intro-B" && <Intro t={t} fase="B" onStart={() => setStep("B")} />}
-      {step === "B"       && <FaseB t={t} onFinish={() => finishFase("B")} />}
-      {step === "intro-C" && <Intro t={t} fase="C" onStart={() => setStep("C")} />}
-      {step === "C"       && <FaseC t={t} onFinish={() => finishFase("C")} />}
-      {step === "intro-D" && <Intro t={t} fase="D" onStart={() => setStep("D")} />}
-      {step === "D"       && <FaseD t={t} onFinish={() => finishFase("D")} />}
-      {step === "done"    && <Done t={t} onBack={onBack} />}
+        {/* Contenido */}
+        {justDone && !activeBloque ? (
+          <BloqueComplete t={t} bloque={justDone} onBack={handleBack} />
+        ) : activeBloque ? (
+          <BloqueSession t={t} bloque={activeBloque} onDone={handleDone} onBack={handleBack} />
+        ) : (
+          <Menu t={t} onSelect={setActiveBloque} elementalDone={progress.elementalDone} />
+        )}
+      </div>
     </div>
   );
 }
