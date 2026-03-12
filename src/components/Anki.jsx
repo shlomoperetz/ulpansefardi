@@ -24,6 +24,10 @@ function norm(str) {
   return str.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[¿¡]/g, "");
 }
 
+function stripNikud(str) {
+  return str.replace(/[\u05B0-\u05C7]/g, "").trim();
+}
+
 export default function Anki({ t, loteId, onBack }) {
   const lote = LOTES.find(l => l.id === loteId);
   const progress = getProgress();
@@ -73,7 +77,7 @@ export default function Anki({ t, loteId, onBack }) {
       ? norm(input) === norm(answer) ||
         answer.split("/").some(a => norm(input) === norm(a.trim())) ||
         answer.split("(")[0].trim().split(" ").some(w => norm(input) === norm(w))
-      : input.trim() === answer;
+      : stripNikud(input) === stripNikud(answer);
 
     saveCardResult(current.he, ok);
 
