@@ -197,7 +197,7 @@ export default function Landing({ t, onNavigate }) {
           () => setShowLotes(v => !v),
           "חֲזָרָה", "jazara",
           "Tarjetas de repaso",
-          `${Object.keys(progress.loteDone).length}/${LOTES.length} lotes completados`,
+          `${LOTES.filter(l => !l.isRepaso && progress.loteDone[l.id]).length}/${LOTES.filter(l => !l.isRepaso).length} lotes completados`,
           showLotes
         )}
 
