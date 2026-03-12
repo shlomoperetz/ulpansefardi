@@ -11,14 +11,18 @@ function save(data) {
   try { localStorage.setItem(KEY, JSON.stringify(data)); } catch {}
 }
 
+const DEFAULTS = {
+  cards: {},
+  loteDone: {},
+  streak: 0,
+  lastSession: null,
+  currentLote: 1,
+};
+
 export function getProgress() {
-  return load() || {
-    cards: {},
-    loteDone: {},
-    streak: 0,
-    lastSession: null,
-    currentLote: 1,
-  };
+  const stored = load();
+  if (!stored) return { ...DEFAULTS };
+  return { ...DEFAULTS, ...stored };
 }
 
 export function saveCardResult(he, wasCorrect) {
@@ -30,7 +34,7 @@ export function saveCardResult(he, wasCorrect) {
   save(p);
 }
 
-export function isLoteDone(loteId, loteCards, progressCards) {
+export function isLoteDone(loteCards, progressCards) {
   return loteCards.every(c => progressCards[c.he]?.mastered);
 }
 
