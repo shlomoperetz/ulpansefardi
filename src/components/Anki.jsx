@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { ALL_CARDS } from "../data/cards";
 import { fonts } from "../theme";
+import { getProgress, saveCardResult, markTodayDone } from "../utils/storage";
 
 const MASTERY = 3;
 
@@ -17,13 +18,20 @@ function norm(str) {
   return str.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[¿¡]/g, "");
 }
 
+function initCards() {
+  const progress = getProgress();
+  return shuffle(ALL_CARDS).map(c => ({
+    ...c,
+    correct: progress.cards[c.he]?.correct || 0,
+  }));
+}
+
 export default function Anki({ t }) {
   const [phase, setPhase] = useState(1);
-  const [cards, setCards] = useState(() => shuffle(ALL_CARDS).map(c => ({ ...c, correct: 0 })));
+  const [cards, setCards] = useState(initCards);
   const [index, setIndex] = useState(0);
   const [input, setInput] = useState("");
   const [feedback, setFeedback] = useState(null);
-  const [mastered, setMastered] = useState(0);
   const [showTr, setShowTr] = useState(false);
   const [transition, setTransition] = useState(false);
   const [done, setDone] = useState(false);
@@ -31,18 +39,25 @@ export default function Anki({ t }) {
 
   const active = cards.filter(c => c.correct < MASTERY);
   const current = active[index % Math.max(active.length, 1)];
+  const mastered = cards.filter(c => c.correct >= MASTERY).length;
+  const pct = Math.round((mastered / ALL_CARDS.length) * 100);
 
   useEffect(() => { if (!feedback) inputRef.current?.focus(); }, [feedback, index]);
 
   useEffect(() => {
     if (active.length === 0 && cards.length > 0) {
+      markTodayDone();
       if (phase === 1) {
         setTransition(true);
         setTimeout(() => {
-          setPhase(2); setCards(shuffle(ALL_CARDS).map(c => ({ ...c, correct: 0 })));
-          setIndex(0); setMastered(0); setFeedback(null); setInput(""); setTransition(false);
+          setPhase(2);
+          setCards(shuffle(ALL_CARDS).map(c => ({ ...c, correct: 0 })));
+          setIndex(0); setFeedback(null); setInput(""); setTransition(false);
         }, 2000);
-      } else { setDone(true); }
+      } else {
+        markTodayDone();
+        setDone(true);
+      }
     }
   }, [active.length]);
 
@@ -50,13 +65,17 @@ export default function Anki({ t }) {
     if (!current || feedback) return;
     const answer = phase === 1 ? current.es : current.he;
     const ok = phase === 1
-      ? norm(input) === norm(answer) || answer.split("/").some(a => norm(input) === norm(a.trim())) || answer.split("(")[0].trim().split(" ").some(w => norm(input) === norm(w))
+      ? norm(input) === norm(answer) ||
+        answer.split("/").some(a => norm(input) === norm(a.trim())) ||
+        answer.split("(")[0].trim().split(" ").some(w => norm(input) === norm(w))
       : input.trim() === answer;
+
+    saveCardResult(current.he, ok);
+
     if (ok) {
       setFeedback("correct");
-      const updated = cards.map(c => c.he === current.he ? { ...c, correct: c.correct + 1 } : c);
+      const updated = cards.map(c => c.he === current.he ? { ...c, correct: Math.min(c.correct + 1, MASTERY) } : c);
       setCards(updated);
-      setMastered(updated.filter(c => c.correct >= MASTERY).length);
       setTimeout(() => { setFeedback(null); setInput(""); setShowTr(false); setIndex(i => i + 1); }, 900);
     } else {
       setFeedback("wrong");
@@ -67,46 +86,38 @@ export default function Anki({ t }) {
   function next() { setFeedback(null); setInput(""); setShowTr(false); setIndex(i => i + 1); }
 
   function restart() {
-    setPhase(1); setCards(shuffle(ALL_CARDS).map(c => ({ ...c, correct: 0 })));
-    setIndex(0); setMastered(0); setFeedback(null); setInput(""); setDone(false);
+    setPhase(1); setCards(initCards()); setIndex(0);
+    setFeedback(null); setInput(""); setDone(false);
   }
 
-  const pct = Math.round((mastered / ALL_CARDS.length) * 100);
+  const cardCorrect = cards.find(c => c.he === current?.he)?.correct || 0;
   const question = current ? (phase === 1 ? current.he : current.es) : "";
   const answer = current ? (phase === 1 ? current.es : current.he) : "";
-  const cardCorrect = cards.find(c => c.he === current?.he)?.correct || 0;
-
-  const wrap = { width: "100%", maxWidth: 520, margin: "0 auto", padding: "0 16px 60px", fontFamily: fonts.serif, color: t.text };
-  const btn = (extra) => ({ background: "none", border: "1px solid " + t.border, borderRadius: 20, padding: "6px 20px", color: t.gold, fontSize: 13, cursor: "pointer", fontFamily: fonts.serif, ...extra });
 
   if (transition) return (
-    <div style={wrap}>
-      <div style={{ textAlign: "center", paddingTop: 80 }}>
-        <div style={{ fontSize: 48, color: t.gold }}>✦</div>
-        <h2 style={{ color: t.text, fontSize: 24, marginTop: 16 }}>Fase 1 completada</h2>
-        <p style={{ color: t.muted }}>Ahora espanol a hebreo</p>
-      </div>
+    <div style={{ maxWidth: 520, margin: "0 auto", padding: "0 16px", fontFamily: fonts.serif, textAlign: "center", paddingTop: 80 }}>
+      <div style={{ fontSize: 48, color: t.gold }}>✦</div>
+      <h2 style={{ color: t.text, fontSize: 24, marginTop: 16 }}>Fase 1 completada</h2>
+      <p style={{ color: t.muted }}>Ahora espanol a hebreo</p>
     </div>
   );
 
   if (done) return (
-    <div style={wrap}>
-      <div style={{ textAlign: "center", paddingTop: 80, display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
-        <div style={{ fontSize: 48, color: t.gold }}>✦</div>
-        <h2 style={{ color: t.text, fontSize: 28, margin: 0 }}>Mazo dominado</h2>
-        <p style={{ color: t.muted, margin: 0 }}>{ALL_CARDS.length} cartas en ambas direcciones</p>
-        <button onClick={restart} style={{ background: t.gold, border: "none", borderRadius: 10, padding: "12px 32px", color: t.bg, fontSize: 14, cursor: "pointer", fontFamily: fonts.serif, marginTop: 8 }}>
-          Volver a empezar
-        </button>
-      </div>
+    <div style={{ maxWidth: 520, margin: "0 auto", padding: "0 16px", fontFamily: fonts.serif, textAlign: "center", paddingTop: 80, display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+      <div style={{ fontSize: 48, color: t.gold }}>✦</div>
+      <h2 style={{ color: t.text, fontSize: 28, margin: 0 }}>Sesion completada</h2>
+      <p style={{ color: t.muted, margin: 0 }}>{mastered}/{ALL_CARDS.length} palabras dominadas</p>
+      <button onClick={restart} style={{ background: t.gold, border: "none", borderRadius: 10, padding: "12px 32px", color: t.bg, fontSize: 14, cursor: "pointer", fontFamily: fonts.serif, marginTop: 8 }}>
+        Seguir practicando
+      </button>
     </div>
   );
 
   return (
-    <div style={wrap}>
+    <div style={{ width: "100%", maxWidth: 520, margin: "0 auto", padding: "0 16px 60px", fontFamily: fonts.serif, color: t.text }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
         <span style={{ fontSize: 11, padding: "3px 12px", border: "1px solid " + t.gold + "44", borderRadius: 20, color: t.gold, letterSpacing: 1, textTransform: "uppercase" }}>
-          {phase === 1 ? "He → Es" : "Es → He"}
+          {phase === 1 ? "He a Es" : "Es a He"}
         </span>
         <span style={{ fontSize: 13, color: t.muted }}>{mastered}/{ALL_CARDS.length} dominadas</span>
       </div>
@@ -117,7 +128,7 @@ export default function Anki({ t }) {
 
       <div style={{ background: t.card, border: "1px solid " + (feedback === "correct" ? t.correct : feedback === "wrong" ? t.wrong : t.border), borderRadius: 16, padding: "36px 32px", display: "flex", flexDirection: "column", alignItems: "center", gap: 16, transition: "border-color 0.3s", boxShadow: "0 8px 40px #00000022" }}>
         <div style={{ fontSize: 11, color: t.subtle, letterSpacing: 1, textTransform: "uppercase", alignSelf: "flex-end" }}>{active.length} restantes</div>
-        <div style={{ fontSize: 12, color: t.muted, letterSpacing: 1, textTransform: "uppercase" }}>{phase === 1 ? "¿Que significa?" : "¿Como se dice en hebreo?"}</div>
+        <div style={{ fontSize: 12, color: t.muted, letterSpacing: 1, textTransform: "uppercase" }}>{phase === 1 ? "Que significa?" : "Como se dice en hebreo?"}</div>
         <div style={{ fontSize: 36, fontWeight: "bold", color: t.text, textAlign: "center", lineHeight: 1.3, direction: "auto" }}>{question}</div>
 
         {phase === 1 && current && (
@@ -138,7 +149,7 @@ export default function Anki({ t }) {
         ) : (
           <div style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", gap: 12, marginTop: 8 }}>
             <div style={{ fontSize: 13, padding: "6px 20px", borderRadius: 20, border: "1px solid", letterSpacing: 1, textTransform: "uppercase", background: feedback === "correct" ? t.correct + "22" : t.wrong + "22", color: feedback === "correct" ? t.correct : t.wrong, borderColor: feedback === "correct" ? t.correct + "55" : t.wrong + "55" }}>
-              {feedback === "correct" ? "✓ correcto" : "✗ incorrecto"}
+              {feedback === "correct" ? "correcto" : "incorrecto"}
             </div>
             {feedback === "wrong" && (
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "16px 24px", background: t.bg, borderRadius: 10, width: "100%", textAlign: "center" }}>
@@ -147,7 +158,7 @@ export default function Anki({ t }) {
                 {phase === 1 && <span style={{ fontSize: 13, color: t.muted, fontStyle: "italic" }}>{current.tr}</span>}
               </div>
             )}
-            {feedback === "wrong" && <button style={btn()} onClick={next}>Continuar →</button>}
+            {feedback === "wrong" && <button style={{ background: "none", border: "1px solid " + t.border, borderRadius: 20, padding: "6px 20px", color: t.gold, fontSize: 13, cursor: "pointer", fontFamily: fonts.serif }} onClick={next}>Continuar</button>}
           </div>
         )}
       </div>
@@ -155,16 +166,6 @@ export default function Anki({ t }) {
       <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 16 }}>
         {Array.from({ length: MASTERY }).map((_, i) => (
           <div key={i} style={{ width: 8, height: 8, borderRadius: "50%", background: i < cardCorrect ? t.gold : t.border, transition: "background 0.3s" }} />
-        ))}
-      </div>
-
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 40, justifyContent: "center" }}>
-        {[1, 2].map(n => (
-          <div key={n} style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: t.muted, opacity: phase === n ? 1 : 0.4 }}>
-            <div style={{ width: 24, height: 24, borderRadius: "50%", border: "1px solid " + (phase === n ? t.gold : t.border), display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11 }}>{n}</div>
-            <span>{n === 1 ? "He → Es" : "Es → He"}</span>
-            {n === 1 && <div style={{ width: 32, height: 1, background: t.border }} />}
-          </div>
         ))}
       </div>
     </div>
