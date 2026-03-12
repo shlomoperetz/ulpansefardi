@@ -174,8 +174,8 @@ export default function Landing({ t, onNavigate }) {
         </div>
       </div>
 
-      <div style={{ textAlign: "center", padding: 24, fontSize: 12, color: t.subtle, borderTop: "1px solid " + t.border }}>
-        ulpansefardi.com · ecosistema <a href="https://siddursefardi.com" style={{ color: t.gold, textDecoration: "none" }}>siddursefardi</a>
+      <div style={{ textAlign: "center", padding: 24, fontSize: 12, color: t.subtle, borderTop: "1px solid " + t.border, fontFamily: fonts.ui }}>
+        ulpansefardi.com · by <a href="https://shlomoperetz.com" style={{ color: t.gold, textDecoration: "none" }}>Shlomo Peretz</a>
       </div>
     </div>
   );
