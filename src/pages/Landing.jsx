@@ -223,6 +223,21 @@ export default function Landing({ t, onNavigate }) {
           </div>
         )}
 
+        {/* ── Alefato (nivel elemental) ── */}
+        <button onClick={() => onNavigate("elemental")} style={{
+          width: "100%", background: t.card, border: "1px solid " + t.border,
+          borderRadius: 14, padding: "20px 24px", cursor: "pointer",
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          fontFamily: fonts.serif, color: t.text, marginBottom: 12,
+        }}>
+          <div style={{ textAlign: "left" }}>
+            <div style={{ fontSize: 20, color: t.gold }}>אָלֶפְבֵּית <span style={{ fontSize: 11, color: t.muted }}>alefbeit</span></div>
+            <div style={{ fontSize: 15, fontWeight: "bold", marginTop: 4 }}>Nivel Elemental</div>
+            <div style={{ fontSize: 12, color: t.muted, marginTop: 2, fontFamily: fonts.ui }}>Letras, nikud y primeras palabras</div>
+          </div>
+          <div style={{ fontSize: 20, color: t.gold }}>→</div>
+        </button>
+
         {/* ── Dikduk (próximamente) ── */}
         <div style={{ background: t.card, border: "1px solid " + t.border, borderRadius: 14, padding: "20px 24px", opacity: 0.45, marginTop: 8 }}>
           <div style={{ fontSize: 20, color: t.gold }}>דִּקְדּוּק <span style={{ fontSize: 11, color: t.muted }}>dikduk</span></div>

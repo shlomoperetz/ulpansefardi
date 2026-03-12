@@ -3,6 +3,7 @@ import { dark, light, fonts } from "./theme";
 import Landing from "./pages/Landing";
 import Anki from "./components/Anki";
 import Lilmod from "./components/Lilmod";
+import Elemental from "./components/Elemental";
 
 export default function App() {
   const [isDark, setIsDark] = useState(false);
@@ -62,6 +63,7 @@ export default function App() {
       {page === "home" && <Landing t={t} onNavigate={handleNavigate} />}
       {page === "anki" && <div style={{ paddingTop: 24 }}><Anki t={t} loteId={activeLote} onBack={() => setPage("home")} /></div>}
       {page === "lilmod" && <div style={{ paddingTop: 24 }}><Lilmod t={t} loteId={activeLote} onBack={() => setPage("home")} /></div>}
+      {page === "elemental" && <div style={{ paddingTop: 0 }}><Elemental t={t} onBack={() => setPage("home")} /></div>}
     </div>
   );
 }
