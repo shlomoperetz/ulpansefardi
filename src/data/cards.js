@@ -68,15 +68,18 @@ export const VERBS = [
 
 export const ALL_CARDS = [...ADJECTIVES, ...VERBS];
 
+
 export const LOTES = [
-  { id: 1, label: "Lote 1", cards: ALL_CARDS.slice(0, 10) },
-  { id: 2, label: "Lote 2", cards: ALL_CARDS.slice(10, 20) },
-  { id: 3, label: "Lote 3", cards: ALL_CARDS.slice(20, 30) },
-  { id: 4, label: "Lote 4", cards: ALL_CARDS.slice(30, 40) },
-  { id: 5, label: "Lote 5", cards: ALL_CARDS.slice(40, 50) },
-  { id: 6, label: "Lote 6", cards: ALL_CARDS.slice(50) },
-  { id: 7, label: "Repaso A", cards: ALL_CARDS.slice(0, 20), isRepaso: true, requires: [1, 2] },
-  { id: 8, label: "Repaso B", cards: ALL_CARDS.slice(20, 40), isRepaso: true, requires: [3, 4] },
-  { id: 9, label: "Repaso C", cards: ALL_CARDS.slice(40), isRepaso: true, requires: [5, 6] },
-  { id: 10, label: "Repaso Final", cards: ALL_CARDS, isRepaso: true, isFinal: true, requires: [7, 8, 9] },
+  // NIVEL 1 — Lotes base
+  { id: 1, label: "Verbos 1",      nivel: 1, cards: VERBS.slice(0, 15) },
+  { id: 2, label: "Verbos 2",      nivel: 1, cards: VERBS.slice(15) },
+  { id: 3, label: "Adjetivos 1",   nivel: 1, cards: ADJECTIVES.slice(0, 16) },
+  { id: 4, label: "Adjetivos 2",   nivel: 1, cards: ADJECTIVES.slice(16) },
+
+  // NIVEL 2 — Repasos por categoria
+  { id: 5, label: "Repaso Verbos",     nivel: 2, cards: VERBS,       isRepaso: true, requires: [1, 2] },
+  { id: 6, label: "Repaso Adjetivos",  nivel: 2, cards: ADJECTIVES,  isRepaso: true, requires: [3, 4] },
+
+  // NIVEL 3 — Repaso general
+  { id: 7, label: "Repaso Final", nivel: 3, cards: ALL_CARDS, isRepaso: true, isFinal: true, requires: [5, 6] },
 ];

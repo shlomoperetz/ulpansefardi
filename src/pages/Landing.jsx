@@ -11,8 +11,11 @@ export default function Landing({ t, onNavigate }) {
   const today = new Date().toISOString().split("T")[0];
   const practicedToday = progress.lastSession === today;
 
-  const baseLotes = LOTES.filter(l => !l.isRepaso);
-  const repasoLotes = LOTES.filter(l => l.isRepaso);
+  const niveles = [
+    { nivel: 1, label: "Nivel 1 — Lotes base" },
+    { nivel: 2, label: "Nivel 2 — Repaso por categoria" },
+    { nivel: 3, label: "Nivel 3 — Repaso final" },
+  ];
 
   function loteStatus(lote) {
     if (progress.loteDone[lote.id]) return "done";
@@ -28,11 +31,10 @@ export default function Landing({ t, onNavigate }) {
       <div
         onClick={() => !locked && onNavigate("anki", lote.id)}
         style={{
-          background: t.card,
-          border: "1px solid " + (done ? t.gold : locked ? t.border : t.border),
-          borderRadius: 12, padding: "16px 20px",
+          background: t.card, borderRadius: 12, padding: "14px 18px",
+          border: "1px solid " + (done ? t.gold : t.border),
           cursor: locked ? "not-allowed" : "pointer",
-          opacity: locked ? 0.4 : 1,
+          opacity: locked ? 0.35 : 1,
           display: "flex", alignItems: "center", justifyContent: "space-between",
           transition: "border-color 0.2s",
         }}
@@ -43,7 +45,7 @@ export default function Landing({ t, onNavigate }) {
           <div style={{ fontSize: 14, color: t.text, fontWeight: done ? "bold" : "normal" }}>{lote.label}</div>
           <div style={{ fontSize: 11, color: t.muted, marginTop: 2 }}>{lote.cards.length} palabras</div>
         </div>
-        <div style={{ fontSize: 18, color: done ? t.gold : locked ? t.subtle : t.muted }}>
+        <div style={{ fontSize: 16, color: done ? t.gold : locked ? t.subtle : t.muted }}>
           {done ? "✦" : locked ? "⊗" : "→"}
         </div>
       </div>
@@ -95,22 +97,28 @@ export default function Landing({ t, onNavigate }) {
             <div style={{ fontSize: 20, color: t.gold }}>חֲזָרָה <span style={{ fontSize: 11, color: t.muted }}>jazara</span></div>
             <div style={{ fontSize: 15, fontWeight: "bold", marginTop: 4 }}>Tarjetas de repaso</div>
             <div style={{ fontSize: 12, color: t.muted, marginTop: 2 }}>
-              {Object.keys(progress.loteDone).length} de {LOTES.length} lotes completados
+              {Object.keys(progress.loteDone).length}/{LOTES.length} lotes completados
             </div>
           </div>
           <div style={{ fontSize: 20, color: t.gold }}>{showLotes ? "↑" : "↓"}</div>
         </button>
 
         {showLotes && (
-          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
-            <div style={{ fontSize: 11, color: t.muted, letterSpacing: 1, textTransform: "uppercase", padding: "4px 4px" }}>Lotes base</div>
-            {baseLotes.map(l => <LoteBtn key={l.id} lote={l} />)}
-            <div style={{ fontSize: 11, color: t.muted, letterSpacing: 1, textTransform: "uppercase", padding: "12px 4px 4px" }}>Repasos</div>
-            {repasoLotes.map(l => <LoteBtn key={l.id} lote={l} />)}
+          <div style={{ display: "flex", flexDirection: "column", gap: 20, marginBottom: 16 }}>
+            {niveles.map(n => (
+              <div key={n.nivel}>
+                <div style={{ fontSize: 11, color: t.muted, letterSpacing: 1, textTransform: "uppercase", marginBottom: 8, paddingLeft: 4 }}>
+                  {n.label}
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  {LOTES.filter(l => l.nivel === n.nivel).map(l => <LoteBtn key={l.id} lote={l} />)}
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
-        <div style={{ background: t.card, border: "1px solid " + t.border, borderRadius: 14, padding: "20px 24px", opacity: 0.45 }}>
+        <div style={{ background: t.card, border: "1px solid " + t.border, borderRadius: 14, padding: "20px 24px", opacity: 0.45, marginTop: 8 }}>
           <div style={{ fontSize: 20, color: t.gold }}>דִּקְדּוּק <span style={{ fontSize: 11, color: t.muted }}>dikduk</span></div>
           <div style={{ fontSize: 15, fontWeight: "bold", marginTop: 4 }}>Gramatica</div>
           <div style={{ fontSize: 12, color: t.muted, marginTop: 2 }}>Proximamente</div>
