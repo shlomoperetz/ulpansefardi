@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { LOTES, BINYAN_COLORS } from "../data/cards";
+import { FRASES_POR_LOTE } from "../data/frases";
 import { fonts } from "../theme";
 import { getProgress, saveCardResult, markTodayDone, markLoteDone, isLoteDone, isLoteUnlocked } from "../utils/storage";
 
@@ -118,20 +119,41 @@ export default function Anki({ t, loteId, onBack }) {
     </div>
   );
 
-  if (done) return (
-    <div style={{ maxWidth: 520, margin: "0 auto", padding: "80px 16px", fontFamily: fonts.serif, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
-      <div style={{ fontSize: 56, color: t.gold }}>{lote.isFinal ? "★" : "✦"}</div>
-      <h2 style={{ color: t.text, fontSize: 28, margin: 0 }}>
-        {lote.isFinal ? "Mazo completo dominado" : lote.label + " completado"}
-      </h2>
-      <p style={{ color: t.muted, margin: 0 }}>
-        {lote.cards.length + " palabras dominadas"}
-      </p>
-      <button onClick={onBack} style={{ background: t.gold, border: "none", borderRadius: 10, padding: "12px 32px", color: t.bg, fontSize: 14, cursor: "pointer", fontFamily: fonts.serif, marginTop: 8 }}>
-        Volver al inicio
-      </button>
-    </div>
-  );
+  if (done) {
+    const frases = FRASES_POR_LOTE[loteId] || [];
+    return (
+      <div style={{ maxWidth: 520, margin: "0 auto", padding: "60px 16px 80px", fontFamily: fonts.serif, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+        <div style={{ fontSize: 56, color: t.gold }}>{lote.isFinal ? "★" : "✦"}</div>
+        <h2 style={{ color: t.text, fontSize: 28, margin: 0 }}>
+          {lote.isFinal ? "Repaso final completado" : lote.label + " completado"}
+        </h2>
+        <p style={{ color: t.muted, margin: 0, fontFamily: fonts.ui }}>
+          {lote.cards.length} palabras dominadas
+        </p>
+
+        {frases.length > 0 && (
+          <div style={{ width: "100%", marginTop: 16, borderTop: "1px solid " + t.border, paddingTop: 20 }}>
+            <div style={{ fontSize: 11, color: t.muted, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui, marginBottom: 16 }}>
+              frases con estas palabras
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {frases.map((f, i) => (
+                <div key={i} style={{ background: t.surface, borderRadius: 12, padding: "16px 20px" }}>
+                  <div style={{ fontSize: 22, fontWeight: "bold", direction: "rtl", color: t.text, lineHeight: 1.4 }}>{f.he}</div>
+                  <div style={{ fontSize: 12, color: t.muted, fontStyle: "italic", fontFamily: fonts.ui, marginTop: 4 }}>{f.tr}</div>
+                  <div style={{ fontSize: 15, color: t.text, fontFamily: fonts.ui, marginTop: 6 }}>{f.es}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        <button onClick={onBack} style={{ background: t.gold, border: "none", borderRadius: 10, padding: "12px 32px", color: t.bg, fontSize: 14, cursor: "pointer", fontFamily: fonts.ui, marginTop: 8 }}>
+          Volver al inicio
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div style={{ width: "100%", maxWidth: 520, margin: "0 auto", padding: "0 16px 60px", fontFamily: fonts.serif, color: t.text }}>
