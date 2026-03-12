@@ -125,7 +125,7 @@ export default function Anki({ t, loteId, onBack }) {
         {lote.isFinal ? "Mazo completo dominado" : lote.label + " completado"}
       </h2>
       <p style={{ color: t.muted, margin: 0 }}>
-        {lote.isFinal ? "Has dominado las 62 palabras" : lote.cards.length + " palabras dominadas"}
+        {lote.cards.length + " palabras dominadas"}
       </p>
       <button onClick={onBack} style={{ background: t.gold, border: "none", borderRadius: 10, padding: "12px 32px", color: t.bg, fontSize: 14, cursor: "pointer", fontFamily: fonts.serif, marginTop: 8 }}>
         Volver al inicio

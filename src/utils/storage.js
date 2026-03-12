@@ -39,7 +39,7 @@ export function isLoteDone(loteCards, progressCards) {
 }
 
 export function isLoteUnlocked(lote, progressLoteDone) {
-  if (!lote.requires) return lote.id === 1;
+  if (!lote.requires) return true;
   return lote.requires.every(id => progressLoteDone[id]);
 }
 
