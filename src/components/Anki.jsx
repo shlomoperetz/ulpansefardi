@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { ALL_CARDS } from "../data/cards";
+import { LOTES } from "../data/cards";
 import { fonts } from "../theme";
-import { getProgress, saveCardResult, markTodayDone } from "../utils/storage";
+import { getProgress, saveCardResult, markTodayDone, markLoteDone, isLoteDone, isLoteUnlocked } from "../utils/storage";
 
 const MASTERY = 3;
 
@@ -18,21 +18,18 @@ function norm(str) {
   return str.trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[¿¡]/g, "");
 }
 
-function initCards() {
+export default function Anki({ t, loteId, onBack }) {
+  const lote = LOTES.find(l => l.id === loteId);
   const progress = getProgress();
-  return shuffle(ALL_CARDS).map(c => ({
-    ...c,
-    correct: progress.cards[c.he]?.correct || 0,
-  }));
-}
 
-export default function Anki({ t }) {
-  const [phase, setPhase] = useState(1);
-  const [cards, setCards] = useState(initCards);
+  const [cards, setCards] = useState(() =>
+    shuffle(lote.cards).map(c => ({ ...c, correct: progress.cards[c.he]?.correct || 0 }))
+  );
   const [index, setIndex] = useState(0);
   const [input, setInput] = useState("");
   const [feedback, setFeedback] = useState(null);
   const [showTr, setShowTr] = useState(false);
+  const [phase, setPhase] = useState(1);
   const [transition, setTransition] = useState(false);
   const [done, setDone] = useState(false);
   const inputRef = useRef(null);
@@ -40,7 +37,8 @@ export default function Anki({ t }) {
   const active = cards.filter(c => c.correct < MASTERY);
   const current = active[index % Math.max(active.length, 1)];
   const mastered = cards.filter(c => c.correct >= MASTERY).length;
-  const pct = Math.round((mastered / ALL_CARDS.length) * 100);
+  const pct = Math.round((mastered / lote.cards.length) * 100);
+  const cardCorrect = cards.find(c => c.he === current?.he)?.correct || 0;
 
   useEffect(() => { if (!feedback) inputRef.current?.focus(); }, [feedback, index]);
 
@@ -51,11 +49,11 @@ export default function Anki({ t }) {
         setTransition(true);
         setTimeout(() => {
           setPhase(2);
-          setCards(shuffle(ALL_CARDS).map(c => ({ ...c, correct: 0 })));
+          setCards(shuffle(lote.cards).map(c => ({ ...c, correct: 0 })));
           setIndex(0); setFeedback(null); setInput(""); setTransition(false);
         }, 2000);
       } else {
-        markTodayDone();
+        markLoteDone(loteId);
         setDone(true);
       }
     }
@@ -85,17 +83,11 @@ export default function Anki({ t }) {
 
   function next() { setFeedback(null); setInput(""); setShowTr(false); setIndex(i => i + 1); }
 
-  function restart() {
-    setPhase(1); setCards(initCards()); setIndex(0);
-    setFeedback(null); setInput(""); setDone(false);
-  }
-
-  const cardCorrect = cards.find(c => c.he === current?.he)?.correct || 0;
   const question = current ? (phase === 1 ? current.he : current.es) : "";
   const answer = current ? (phase === 1 ? current.es : current.he) : "";
 
   if (transition) return (
-    <div style={{ maxWidth: 520, margin: "0 auto", padding: "0 16px", fontFamily: fonts.serif, textAlign: "center", paddingTop: 80 }}>
+    <div style={{ maxWidth: 520, margin: "0 auto", padding: "80px 16px", fontFamily: fonts.serif, textAlign: "center" }}>
       <div style={{ fontSize: 48, color: t.gold }}>✦</div>
       <h2 style={{ color: t.text, fontSize: 24, marginTop: 16 }}>Fase 1 completada</h2>
       <p style={{ color: t.muted }}>Ahora espanol a hebreo</p>
@@ -103,12 +95,16 @@ export default function Anki({ t }) {
   );
 
   if (done) return (
-    <div style={{ maxWidth: 520, margin: "0 auto", padding: "0 16px", fontFamily: fonts.serif, textAlign: "center", paddingTop: 80, display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
-      <div style={{ fontSize: 48, color: t.gold }}>✦</div>
-      <h2 style={{ color: t.text, fontSize: 28, margin: 0 }}>Sesion completada</h2>
-      <p style={{ color: t.muted, margin: 0 }}>{mastered}/{ALL_CARDS.length} palabras dominadas</p>
-      <button onClick={restart} style={{ background: t.gold, border: "none", borderRadius: 10, padding: "12px 32px", color: t.bg, fontSize: 14, cursor: "pointer", fontFamily: fonts.serif, marginTop: 8 }}>
-        Seguir practicando
+    <div style={{ maxWidth: 520, margin: "0 auto", padding: "80px 16px", fontFamily: fonts.serif, textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center", gap: 16 }}>
+      <div style={{ fontSize: 56, color: t.gold }}>{lote.isFinal ? "★" : "✦"}</div>
+      <h2 style={{ color: t.text, fontSize: 28, margin: 0 }}>
+        {lote.isFinal ? "Mazo completo dominado" : lote.label + " completado"}
+      </h2>
+      <p style={{ color: t.muted, margin: 0 }}>
+        {lote.isFinal ? "Has dominado las 62 palabras" : lote.cards.length + " palabras dominadas"}
+      </p>
+      <button onClick={onBack} style={{ background: t.gold, border: "none", borderRadius: 10, padding: "12px 32px", color: t.bg, fontSize: 14, cursor: "pointer", fontFamily: fonts.serif, marginTop: 8 }}>
+        Volver al inicio
       </button>
     </div>
   );
@@ -116,14 +112,15 @@ export default function Anki({ t }) {
   return (
     <div style={{ width: "100%", maxWidth: 520, margin: "0 auto", padding: "0 16px 60px", fontFamily: fonts.serif, color: t.text }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
-        <span style={{ fontSize: 11, padding: "3px 12px", border: "1px solid " + t.gold + "44", borderRadius: 20, color: t.gold, letterSpacing: 1, textTransform: "uppercase" }}>
-          {phase === 1 ? "He a Es" : "Es a He"}
-        </span>
-        <span style={{ fontSize: 13, color: t.muted }}>{mastered}/{ALL_CARDS.length} dominadas</span>
+        <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+          <button onClick={onBack} style={{ background: "none", border: "none", color: t.muted, fontSize: 12, cursor: "pointer", fontFamily: fonts.serif }}>← volver</button>
+          <span style={{ fontSize: 11, padding: "3px 12px", border: "1px solid " + t.gold + "44", borderRadius: 20, color: t.gold, letterSpacing: 1, textTransform: "uppercase" }}>{lote.label}</span>
+        </div>
+        <span style={{ fontSize: 13, color: t.muted }}>{mastered}/{lote.cards.length}</span>
       </div>
 
-      <div style={{ width: "100%", height: 2, background: t.surface, borderRadius: 2, marginBottom: 32, overflow: "hidden" }}>
-        <div style={{ height: "100%", width: pct + "%", background: "linear-gradient(90deg," + t.gold + "," + t.goldLight + ")", transition: "width 0.5s" }} />
+      <div style={{ width: "100%", height: 6, background: t.surface, borderRadius: 3, marginBottom: 32, overflow: "hidden" }}>
+        <div style={{ height: "100%", width: pct + "%", background: "linear-gradient(90deg," + t.gold + "," + t.goldLight + ")", borderRadius: 3, transition: "width 0.5s" }} />
       </div>
 
       <div style={{ background: t.card, border: "1px solid " + (feedback === "correct" ? t.correct : feedback === "wrong" ? t.wrong : t.border), borderRadius: 16, padding: "36px 32px", display: "flex", flexDirection: "column", alignItems: "center", gap: 16, transition: "border-color 0.3s", boxShadow: "0 8px 40px #00000022" }}>

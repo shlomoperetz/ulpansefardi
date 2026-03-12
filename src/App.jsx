@@ -6,20 +6,20 @@ import Anki from "./components/Anki";
 export default function App() {
   const [isDark, setIsDark] = useState(true);
   const [page, setPage] = useState("home");
+  const [activeLote, setActiveLote] = useState(1);
   const t = isDark ? dark : light;
 
+  function handleNavigate(dest, loteId) {
+    if (loteId) setActiveLote(loteId);
+    setPage(dest);
+  }
+
   const navStyle = {
-    position: "fixed",
-    top: 0, left: 0, right: 0,
-    zIndex: 100,
-    background: t.bg + "ee",
-    backdropFilter: "blur(8px)",
+    position: "fixed", top: 0, left: 0, right: 0, zIndex: 100,
+    background: t.bg + "ee", backdropFilter: "blur(8px)",
     borderBottom: "1px solid " + t.border,
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    padding: "12px 24px",
-    fontFamily: fonts.serif,
+    display: "flex", justifyContent: "space-between", alignItems: "center",
+    padding: "12px 24px", fontFamily: fonts.serif,
   };
 
   return (
@@ -27,8 +27,7 @@ export default function App() {
       <nav style={navStyle}>
         <button onClick={() => setPage("home")} style={{
           background: "none", border: "none", color: t.gold,
-          fontSize: 16, fontFamily: fonts.serif, cursor: "pointer",
-          fontWeight: "bold", letterSpacing: 1,
+          fontSize: 16, fontFamily: fonts.serif, cursor: "pointer", fontWeight: "bold",
         }}>
           אולפן ספרדי
         </button>
@@ -50,8 +49,8 @@ export default function App() {
           </button>
         </div>
       </nav>
-      {page === "home" && <Landing t={t} onNavigate={setPage} />}
-      {page === "anki" && <div style={{ paddingTop: 24 }}><Anki t={t} /></div>}
+      {page === "home" && <Landing t={t} onNavigate={handleNavigate} />}
+      {page === "anki" && <div style={{ paddingTop: 24 }}><Anki t={t} loteId={activeLote} onBack={() => setPage("home")} /></div>}
     </div>
   );
 }

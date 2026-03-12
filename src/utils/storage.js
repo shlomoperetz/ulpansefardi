@@ -14,8 +14,10 @@ function save(data) {
 export function getProgress() {
   return load() || {
     cards: {},
+    loteDone: {},
     streak: 0,
     lastSession: null,
+    currentLote: 1,
   };
 }
 
@@ -25,6 +27,21 @@ export function saveCardResult(he, wasCorrect) {
   if (wasCorrect) p.cards[he].correct += 1;
   else p.cards[he].correct = Math.max(0, (p.cards[he].correct || 0) - 1);
   if (p.cards[he].correct >= 3) p.cards[he].mastered = true;
+  save(p);
+}
+
+export function isLoteDone(loteId, loteCards, progressCards) {
+  return loteCards.every(c => progressCards[c.he]?.mastered);
+}
+
+export function isLoteUnlocked(lote, progressLoteDone) {
+  if (!lote.requires) return lote.id === 1;
+  return lote.requires.every(id => progressLoteDone[id]);
+}
+
+export function markLoteDone(loteId) {
+  const p = getProgress();
+  p.loteDone[loteId] = true;
   save(p);
 }
 

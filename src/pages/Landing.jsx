@@ -1,19 +1,54 @@
+import { useState } from "react";
 import { fonts } from "../theme";
-import { getProgress } from "../utils/storage";
-import { ALL_CARDS } from "../data/cards";
+import { getProgress, isLoteUnlocked } from "../utils/storage";
+import { ALL_CARDS, LOTES } from "../data/cards";
 
 export default function Landing({ t, onNavigate }) {
+  const [showLotes, setShowLotes] = useState(false);
   const progress = getProgress();
   const mastered = Object.values(progress.cards).filter(c => c.mastered).length;
   const pct = Math.round((mastered / ALL_CARDS.length) * 100);
   const today = new Date().toISOString().split("T")[0];
   const practicedToday = progress.lastSession === today;
 
-  const tools = [
-    { id: "anki", he: "חֲזָרָה", tr: "jazara", title: "Tarjetas de repaso", desc: "Verbos y adjetivos. Hebreo a espanol y espanol a hebreo.", ready: true },
-    { id: "gramatica", he: "דִּקְדּוּק", tr: "dikduk", title: "Gramatica", desc: "Binyanim, conjugaciones, smijut. Proximamente.", ready: false },
-    { id: "frases", he: "מִשְׁפָּטִים", tr: "mishpatim", title: "Frases de rutina", desc: "Frases del dia a dia. Proximamente.", ready: false },
-  ];
+  const baseLotes = LOTES.filter(l => !l.isRepaso);
+  const repasoLotes = LOTES.filter(l => l.isRepaso);
+
+  function loteStatus(lote) {
+    if (progress.loteDone[lote.id]) return "done";
+    if (isLoteUnlocked(lote, progress.loteDone)) return "open";
+    return "locked";
+  }
+
+  function LoteBtn({ lote }) {
+    const status = loteStatus(lote);
+    const locked = status === "locked";
+    const done = status === "done";
+    return (
+      <div
+        onClick={() => !locked && onNavigate("anki", lote.id)}
+        style={{
+          background: t.card,
+          border: "1px solid " + (done ? t.gold : locked ? t.border : t.border),
+          borderRadius: 12, padding: "16px 20px",
+          cursor: locked ? "not-allowed" : "pointer",
+          opacity: locked ? 0.4 : 1,
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          transition: "border-color 0.2s",
+        }}
+        onMouseEnter={e => { if (!locked) e.currentTarget.style.borderColor = t.gold; }}
+        onMouseLeave={e => { e.currentTarget.style.borderColor = done ? t.gold : t.border; }}
+      >
+        <div>
+          <div style={{ fontSize: 14, color: t.text, fontWeight: done ? "bold" : "normal" }}>{lote.label}</div>
+          <div style={{ fontSize: 11, color: t.muted, marginTop: 2 }}>{lote.cards.length} palabras</div>
+        </div>
+        <div style={{ fontSize: 18, color: done ? t.gold : locked ? t.subtle : t.muted }}>
+          {done ? "✦" : locked ? "⊗" : "→"}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: "100vh", background: t.bg, fontFamily: fonts.serif, color: t.text }}>
@@ -29,7 +64,7 @@ export default function Landing({ t, onNavigate }) {
           <div style={{ width: "100%", height: 6, background: t.surface, borderRadius: 3, overflow: "hidden" }}>
             <div style={{ height: "100%", width: pct + "%", background: "linear-gradient(90deg," + t.gold + "," + t.goldLight + ")", borderRadius: 3, transition: "width 0.5s" }} />
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 20 }}>
+          <div style={{ display: "flex", justifyContent: "space-around", marginTop: 20 }}>
             <div style={{ textAlign: "center" }}>
               <div style={{ fontSize: 24, fontWeight: "bold", color: t.text }}>{mastered}</div>
               <div style={{ fontSize: 11, color: t.muted, marginTop: 2, letterSpacing: 1, textTransform: "uppercase" }}>dominadas</div>
@@ -39,35 +74,47 @@ export default function Landing({ t, onNavigate }) {
               <div style={{ fontSize: 11, color: t.muted, marginTop: 2, letterSpacing: 1, textTransform: "uppercase" }}>pendientes</div>
             </div>
             <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: 24, fontWeight: "bold", color: practicedToday ? t.correct : t.text }}>
-                {progress.streak || 0}
-              </div>
+              <div style={{ fontSize: 24, fontWeight: "bold", color: practicedToday ? t.correct : t.text }}>{progress.streak || 0}</div>
               <div style={{ fontSize: 11, color: t.muted, marginTop: 2, letterSpacing: 1, textTransform: "uppercase" }}>dias seguidos</div>
             </div>
           </div>
           {practicedToday && (
-            <div style={{ marginTop: 16, fontSize: 12, color: t.correct, textAlign: "center", letterSpacing: 0.5 }}>
-              ✓ has practicado hoy
-            </div>
+            <div style={{ marginTop: 16, fontSize: 12, color: t.correct, textAlign: "center" }}>✓ has practicado hoy</div>
           )}
         </div>
       </div>
 
-      <div style={{ maxWidth: 560, margin: "0 auto", padding: "0 24px 80px", display: "flex", flexDirection: "column", gap: 12 }}>
-        {tools.map(tool => (
-          <div key={tool.id} onClick={() => tool.ready && onNavigate(tool.id)}
-            style={{ background: t.card, border: "1px solid " + t.border, borderRadius: 14, padding: "20px 24px", cursor: tool.ready ? "pointer" : "default", opacity: tool.ready ? 1 : 0.45, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}
-            onMouseEnter={e => { if (tool.ready) e.currentTarget.style.borderColor = t.gold; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = t.border; }}
-          >
-            <div>
-              <div style={{ fontSize: 20, color: t.gold }}>{tool.he} <span style={{ fontSize: 11, color: t.muted }}>{tool.tr}</span></div>
-              <div style={{ fontSize: 15, color: t.text, fontWeight: "bold", marginTop: 4 }}>{tool.title}</div>
-              <div style={{ fontSize: 12, color: t.muted, marginTop: 2 }}>{tool.desc}</div>
+      <div style={{ maxWidth: 560, margin: "0 auto", padding: "0 24px 80px" }}>
+        <button onClick={() => setShowLotes(v => !v)} style={{
+          width: "100%", background: t.card, border: "1px solid " + t.border,
+          borderRadius: 14, padding: "20px 24px", cursor: "pointer",
+          display: "flex", alignItems: "center", justifyContent: "space-between",
+          fontFamily: fonts.serif, color: t.text, marginBottom: 12,
+        }}>
+          <div style={{ textAlign: "left" }}>
+            <div style={{ fontSize: 20, color: t.gold }}>חֲזָרָה <span style={{ fontSize: 11, color: t.muted }}>jazara</span></div>
+            <div style={{ fontSize: 15, fontWeight: "bold", marginTop: 4 }}>Tarjetas de repaso</div>
+            <div style={{ fontSize: 12, color: t.muted, marginTop: 2 }}>
+              {Object.keys(progress.loteDone).length} de {LOTES.length} lotes completados
             </div>
-            {tool.ready && <div style={{ fontSize: 20, color: t.gold }}>→</div>}
           </div>
-        ))}
+          <div style={{ fontSize: 20, color: t.gold }}>{showLotes ? "↑" : "↓"}</div>
+        </button>
+
+        {showLotes && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
+            <div style={{ fontSize: 11, color: t.muted, letterSpacing: 1, textTransform: "uppercase", padding: "4px 4px" }}>Lotes base</div>
+            {baseLotes.map(l => <LoteBtn key={l.id} lote={l} />)}
+            <div style={{ fontSize: 11, color: t.muted, letterSpacing: 1, textTransform: "uppercase", padding: "12px 4px 4px" }}>Repasos</div>
+            {repasoLotes.map(l => <LoteBtn key={l.id} lote={l} />)}
+          </div>
+        )}
+
+        <div style={{ background: t.card, border: "1px solid " + t.border, borderRadius: 14, padding: "20px 24px", opacity: 0.45 }}>
+          <div style={{ fontSize: 20, color: t.gold }}>דִּקְדּוּק <span style={{ fontSize: 11, color: t.muted }}>dikduk</span></div>
+          <div style={{ fontSize: 15, fontWeight: "bold", marginTop: 4 }}>Gramatica</div>
+          <div style={{ fontSize: 12, color: t.muted, marginTop: 2 }}>Proximamente</div>
+        </div>
       </div>
 
       <div style={{ textAlign: "center", padding: 24, fontSize: 12, color: t.subtle, borderTop: "1px solid " + t.border }}>
