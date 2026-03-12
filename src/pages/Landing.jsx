@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { fonts } from "../theme";
-import { getProgress, isLoteUnlocked } from "../utils/storage";
+import { getProgress, isLoteUnlocked, isCardDue, getLoteDueCount, getLoteNextReview } from "../utils/storage";
 import { ALL_CARDS, LOTES } from "../data/cards";
 import { FRASES_POR_LOTE } from "../data/frases";
 import { BLOQUES_ALEFATO } from "../data/alefato";
@@ -14,6 +14,11 @@ export default function Landing({ t, onNavigate }) {
   const pct = Math.round((mastered / ALL_CARDS.length) * 100);
   const today = new Date().toISOString().split("T")[0];
   const practicedToday = progress.lastSession === today;
+
+  // Cartas SRS vencidas hoy (solo las que ya tienen historial)
+  const dueToday = ALL_CARDS.filter(c =>
+    progress.cards[c.he]?.srsNextReview && isCardDue(progress.cards[c.he])
+  ).length;
 
   // Frases acumuladas de todos los lotes completados
   const frasesDesbloqueadas = Object.entries(FRASES_POR_LOTE)
@@ -34,23 +39,28 @@ export default function Landing({ t, onNavigate }) {
   }
 
   function LoteBtn({ lote }) {
-    const status = loteStatus(lote);
-    const locked = status === "locked";
-    const done = status === "done";
+    const status   = loteStatus(lote);
+    const locked   = status === "locked";
+    const done     = status === "done";
     const hasFrases = !!FRASES_POR_LOTE[lote.id];
+    const dueCount = done ? getLoteDueCount(lote.cards, progress.cards) : 0;
+    const hasDue   = dueCount > 0;
+    const nextDate = (done && !hasDue) ? getLoteNextReview(lote.cards, progress.cards) : null;
+    const daysLeft = nextDate ? Math.ceil((new Date(nextDate) - new Date(today)) / 86400000) : null;
+
     return (
       <div
         onClick={() => !locked && onNavigate("anki", lote.id)}
         style={{
           background: t.card, borderRadius: 12, padding: "14px 18px",
-          border: "1px solid " + (done ? t.gold : t.border),
+          border: "1px solid " + (hasDue ? t.gold : done ? t.gold + "66" : t.border),
           cursor: locked ? "not-allowed" : "pointer",
           opacity: locked ? 0.35 : 1,
           display: "flex", alignItems: "center", justifyContent: "space-between",
           transition: "border-color 0.2s",
         }}
         onMouseEnter={e => { if (!locked) e.currentTarget.style.borderColor = t.gold; }}
-        onMouseLeave={e => { e.currentTarget.style.borderColor = done ? t.gold : t.border; }}
+        onMouseLeave={e => { e.currentTarget.style.borderColor = hasDue ? t.gold : done ? t.gold + "66" : t.border; }}
       >
         <div>
           <div style={{ fontSize: 14, color: t.text, fontWeight: done ? "bold" : "normal", display: "flex", alignItems: "center", gap: 6 }}>
@@ -60,14 +70,24 @@ export default function Landing({ t, onNavigate }) {
             )}
           </div>
           <div style={{ fontSize: 11, color: t.muted, marginTop: 2, fontFamily: fonts.ui }}>{lote.cards.length} palabras</div>
+          {hasDue && (
+            <div style={{ fontSize: 11, color: t.gold, marginTop: 3, fontFamily: fonts.ui }}>
+              ↺ {dueCount} para repasar hoy
+            </div>
+          )}
+          {!hasDue && daysLeft !== null && (
+            <div style={{ fontSize: 11, color: t.subtle, marginTop: 3, fontFamily: fonts.ui }}>
+              próxima revisión: {daysLeft === 1 ? "mañana" : `en ${daysLeft} días`}
+            </div>
+          )}
           {hasFrases && !done && !locked && (
             <div style={{ fontSize: 11, color: t.subtle, marginTop: 3, direction: "rtl", fontFamily: fonts.serif }}>
               {FRASES_POR_LOTE[lote.id][0].he}
             </div>
           )}
         </div>
-        <div style={{ fontSize: 16, color: done ? t.gold : locked ? t.subtle : t.muted, flexShrink: 0, marginLeft: 12 }}>
-          {done ? "✦" : locked ? "⊗" : "→"}
+        <div style={{ fontSize: 16, color: hasDue ? t.gold : done ? t.gold + "99" : locked ? t.subtle : t.muted, flexShrink: 0, marginLeft: 12 }}>
+          {hasDue ? "↺" : done ? "✦" : locked ? "⊗" : "→"}
         </div>
       </div>
     );
@@ -117,7 +137,12 @@ export default function Landing({ t, onNavigate }) {
               <div style={{ fontSize: 11, color: t.muted, marginTop: 2, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui }}>dias seguidos</div>
             </div>
           </div>
-          {practicedToday && (
+          {dueToday > 0 && (
+            <div style={{ marginTop: 16, fontSize: 12, color: t.gold, textAlign: "center", fontFamily: fonts.ui }}>
+              ↺ {dueToday} {dueToday === 1 ? "carta" : "cartas"} para repasar hoy
+            </div>
+          )}
+          {practicedToday && dueToday === 0 && (
             <div style={{ marginTop: 16, fontSize: 12, color: t.correct, textAlign: "center", fontFamily: fonts.ui }}>✓ has practicado hoy</div>
           )}
         </div>
