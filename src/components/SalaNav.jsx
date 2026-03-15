@@ -13,15 +13,17 @@ const TABS = [
 
 function getNextAction(p) {
   const queue = getStudyQueue(p, WORDS);
-  const sentencesOk = (p.sentencesCorrect || 0) >= 5;
+  const compOk = (p.frasesComp || 0) >= 3;
+  const escOk  = (p.frasesEsc  || 0) >= 3;
+  const frasesOk = compOk && escOk;
   const dialogueOk = Object.values(p.dialogues || {}).some(d => d.passed);
   const maxUnlocked = Math.max(...(p.unlockedGroups || [1]));
   const hasNextGroup = maxUnlocked < 12;
 
   if (queue.length > 0) return "pasos";
-  if (!sentencesOk && !dialogueOk) return "mishnatot";
-  if (sentencesOk && !dialogueOk) return "dialogos";
-  if (hasNextGroup && (sentencesOk || dialogueOk)) return "pasos";
+  if (!frasesOk) return "mishnatot";
+  if (!dialogueOk) return "dialogos";
+  if (hasNextGroup) return "pasos";
   return null;
 }
 

@@ -212,7 +212,9 @@ export default function Home({ t, onNavigate, mastered, mana }) {
       {/* ── Cycle Progress Widget ─────────────────────────────────────────── */}
       {(() => {
         const pasosOk = studyQueue.length === 0 && (p.unlockedGroups || [1]).length > 0;
-        const sentencesOk = (p.sentencesCorrect || 0) >= 5;
+        const compOk = (p.frasesComp || 0) >= 3;
+        const escOk  = (p.frasesEsc  || 0) >= 3;
+        const sentencesOk = compOk && escOk;
         const dialogueOk = Object.values(p.dialogues || {}).some(d => d.passed);
         const canUnlock = sentencesOk || dialogueOk;
         const hasNextGroup = maxUnlocked < totalGroups;
@@ -227,7 +229,7 @@ export default function Home({ t, onNavigate, mastered, mana }) {
 
         const cycleSteps = [
           { icon: "⚡", label: "Pasos",    sala: "pasos",    done: pasosOk },
-          { icon: "✍️", label: "Frases",   sala: "mishnatot", done: sentencesOk },
+          { icon: "✍️", label: "Frases",   sala: "mishnatot", done: sentencesOk, sub: sentencesOk ? null : (compOk ? "comp ✓ · esc ⟳" : escOk ? "comp ⟳ · esc ✓" : null) },
           { icon: "💬", label: "Diálogos", sala: "dialogos",  done: dialogueOk },
           { icon: "🔓", label: hasNextGroup ? "Grupo " + (maxUnlocked + 1) : "¡Completo!", sala: "pasos", done: !hasNextGroup && canUnlock },
         ];
@@ -313,6 +315,17 @@ export default function Home({ t, onNavigate, mastered, mana }) {
                       }}>
                         {step.label}
                       </span>
+                      {step.sub && (
+                        <span style={{
+                          fontSize: 8,
+                          fontFamily: fonts.ui,
+                          color: t.subtle,
+                          lineHeight: 1,
+                          whiteSpace: "nowrap",
+                        }}>
+                          {step.sub}
+                        </span>
+                      )}
                     </button>
 
                     {/* Connector arrow */}

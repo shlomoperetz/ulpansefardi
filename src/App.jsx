@@ -25,6 +25,8 @@ if (isDemo) {
     streak: 7,
     lastSession: yesterday,
     sentencesCorrect: 20,
+    frasesComp: 10,
+    frasesEsc: 10,
   };
   WORDS.forEach(w => {
     demo.words[w.id] = {
