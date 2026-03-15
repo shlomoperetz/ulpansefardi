@@ -5,6 +5,7 @@ import Peldanos from "./components/Peldanos";
 import Patrones from "./components/Patrones";
 import Dialogos from "./components/Dialogos";
 import Elemental from "./components/Elemental";
+import Mishnatot from "./components/Mishnatot";
 import { enableDemoMode, getProgress, markTodayDone } from "./utils/storage";
 import { getActiveMana, getMasteredCount } from "./utils/mana";
 import { WORDS } from "./data/words";
@@ -150,7 +151,8 @@ export default function App() {
         {page === "peldanos"  && <Peldanos t={t} onBack={goHome} onManaChange={refreshMana} />}
         {page === "patrones"  && <Patrones t={t} onBack={goHome} />}
         {page === "dialogos"  && <Dialogos t={t} onBack={goHome} />}
-        {page === "elemental" && <Elemental t={t} onBack={goHome} />}
+        {page === "elemental"   && <Elemental t={t} onBack={goHome} />}
+        {page === "mishnatot"  && <Mishnatot t={t} onBack={goHome} />}
       </div>
     </div>
   );

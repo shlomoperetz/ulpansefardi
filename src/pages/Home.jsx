@@ -4,6 +4,7 @@ import { getProgress } from "../utils/storage";
 import { getMasteredCount, getActiveMana, getStudyQueue } from "../utils/mana";
 import { WORDS } from "../data/words";
 import { DIALOGUES } from "../data/dialogues";
+import { SENTENCES } from "../data/sentences";
 
 const SALAS = [
   {
@@ -12,6 +13,13 @@ const SALAS = [
     label: "Peldaños",
     labelHe: "מַדְרֵגוֹת",
     desc: "Aprende y repasa palabras con el sistema de maná.",
+  },
+  {
+    id: "mishnatot",
+    icon: "✍️",
+    label: "Frases",
+    labelHe: "מִשְׁנָתוֹת",
+    desc: "Traduce frases con las palabras que has aprendido.",
   },
   {
     id: "dialogos",
@@ -255,6 +263,8 @@ export default function Home({ t, onNavigate, mastered, mana }) {
             stat = completedDialogues + " / " + DIALOGUES.length + " completados";
           } else if (sala.id === "patrones") {
             stat = WORDS.filter(w => unlocked.includes(w.group)).length + " palabras desbloqueadas";
+          } else if (sala.id === "mishnatot") {
+            stat = SENTENCES.filter(s => groupsUnlocked >= s.unlocksAtGroup).length + " frases disponibles";
           }
 
           return (
