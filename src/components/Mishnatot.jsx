@@ -92,6 +92,14 @@ export default function Mishnatot({ t, onBack }) {
   const answer   = sentence ? (mode === "es2he" ? sentence.he : sentence.es) : "";
   const hint     = sentence?.tr;
 
+  const GENDER_LABELS = {
+    ms: { label: "m.s.", title: "masculino singular — אַתָּה / הוּא / אֲנִי" },
+    fs: { label: "f.s.", title: "femenino singular — אַתְּ / הִיא / אֲנִי" },
+    mp: { label: "m.pl.", title: "masculino plural — אֲנַחְנוּ / אַתֶּם / הֵם" },
+    fp: { label: "f.pl.", title: "femenino plural — אֲנַחְנוּ / אַתֶּן / הֵן" },
+  };
+  const genderInfo = mode === "es2he" && sentence?.gender ? GENDER_LABELS[sentence.gender] : null;
+
   function handleSubmit() {
     if (!sentence || result !== null) return;
     const ok = isCorrect(input, answer);
@@ -184,8 +192,23 @@ export default function Mishnatot({ t, onBack }) {
         borderRadius: 18, padding: "28px 24px", marginBottom: 20,
         textAlign: "center",
       }}>
-        <div style={{ fontSize: 11, color: t.muted, textTransform: "uppercase", letterSpacing: 1, marginBottom: 14 }}>
-          {mode === "es2he" ? "Escribe en hebreo" : "Traduce al español"}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 14 }}>
+          <span style={{ fontSize: 11, color: t.muted, textTransform: "uppercase", letterSpacing: 1 }}>
+            {mode === "es2he" ? "Escribe en hebreo" : "Traduce al español"}
+          </span>
+          {genderInfo && (
+            <span
+              title={genderInfo.title}
+              style={{
+                fontSize: 11, padding: "2px 8px", borderRadius: 20,
+                background: t.gold + "22", color: t.gold,
+                border: "1px solid " + t.gold + "55",
+                cursor: "help", letterSpacing: 0.5,
+              }}
+            >
+              {genderInfo.label}
+            </span>
+          )}
         </div>
         <div style={{
           fontSize: mode === "he2es" ? 28 : 20,
