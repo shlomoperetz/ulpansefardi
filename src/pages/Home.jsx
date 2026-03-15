@@ -209,45 +209,147 @@ export default function Home({ t, onNavigate, mastered, mana }) {
         </div>
       </div>
 
-      {/* ── Active Mana Bar ──────────────────────────────────────────────────── */}
-      <div style={{
-        background: t.card,
-        border: "1px solid " + t.border,
-        borderRadius: 12,
-        padding: "14px 18px",
-        marginBottom: 24,
-        display: "flex",
-        alignItems: "center",
-        gap: 14,
-      }}>
-        <span style={{ fontSize: 20 }}>⚡</span>
-        <div style={{ flex: 1 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 6 }}>
-            <span style={{ fontSize: 12, color: t.muted }}>Maná activo</span>
-            <span style={{ fontSize: 12, color: t.gold, fontWeight: "bold" }}>{mana}%</span>
-          </div>
-          <div style={{ height: 6, background: t.surface, borderRadius: 3, overflow: "hidden" }}>
+      {/* ── Cycle Progress Widget ─────────────────────────────────────────── */}
+      {(() => {
+        const pasosOk = studyQueue.length === 0 && (p.unlockedGroups || [1]).length > 0;
+        const sentencesOk = (p.sentencesCorrect || 0) >= 5;
+        const dialogueOk = Object.values(p.dialogues || {}).some(d => d.passed);
+        const canUnlock = sentencesOk || dialogueOk;
+        const hasNextGroup = maxUnlocked < totalGroups;
+
+        // Determine active (next recommended) step index
+        let activeIdx;
+        if (!pasosOk) activeIdx = 0;
+        else if (!sentencesOk && !dialogueOk) activeIdx = 1;
+        else if (!dialogueOk) activeIdx = 2;
+        else if (hasNextGroup) activeIdx = 3;
+        else activeIdx = -1; // all done
+
+        const cycleSteps = [
+          { icon: "⚡", label: "Pasos",    sala: "pasos",    done: pasosOk },
+          { icon: "✍️", label: "Frases",   sala: "mishnatot", done: sentencesOk },
+          { icon: "💬", label: "Diálogos", sala: "dialogos",  done: dialogueOk },
+          { icon: "🔓", label: hasNextGroup ? "Grupo " + (maxUnlocked + 1) : "¡Completo!", sala: "pasos", done: !hasNextGroup && canUnlock },
+        ];
+
+        return (
+          <div style={{
+            background: t.card,
+            border: "1px solid " + t.border,
+            borderRadius: 14,
+            padding: "16px 18px",
+            marginBottom: 24,
+          }}>
             <div style={{
-              height: "100%",
-              width: mana + "%",
-              background: "linear-gradient(90deg," + t.gold + "," + t.goldLight + ")",
-              borderRadius: 3,
-              transition: "width 0.5s",
-            }} />
-          </div>
-          {mana < 65 && (
-            <div style={{ fontSize: 11, color: t.muted, marginTop: 5 }}>
-              Estudia hasta llegar a 65% para desbloquear el siguiente grupo
+              fontSize: 11,
+              color: t.muted,
+              textTransform: "uppercase",
+              letterSpacing: 1,
+              marginBottom: 14,
+            }}>
+              Ciclo de aprendizaje — Grupo {maxUnlocked}/{totalGroups}
             </div>
-          )}
-        </div>
-        <div style={{ textAlign: "right", flexShrink: 0 }}>
-          <div style={{ fontSize: 13, color: t.text, fontWeight: "bold" }}>
-            {groupsUnlocked}/{totalGroups}
+
+            <div style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 0,
+            }}>
+              {cycleSteps.map((step, i) => {
+                const isActive = activeIdx === i;
+                const isDone = step.done;
+                const isLocked = !isDone && !isActive && i > activeIdx && activeIdx !== -1;
+
+                let nodeColor, nodeBg, labelColor;
+                if (isDone) {
+                  nodeColor = t.correct;
+                  nodeBg = t.correct + "22";
+                  labelColor = t.correct;
+                } else if (isActive) {
+                  nodeColor = t.gold;
+                  nodeBg = t.gold + "22";
+                  labelColor = t.gold;
+                } else {
+                  nodeColor = t.subtle;
+                  nodeBg = t.surface;
+                  labelColor = t.subtle;
+                }
+
+                return (
+                  <div key={step.sala + i} style={{ display: "flex", alignItems: "center", flex: i < cycleSteps.length - 1 ? 1 : 0 }}>
+                    {/* Node */}
+                    <button
+                      onClick={() => onNavigate(step.sala)}
+                      title={step.label}
+                      style={{
+                        background: nodeBg,
+                        border: "2px solid " + nodeColor,
+                        borderRadius: 10,
+                        padding: "6px 8px",
+                        cursor: "pointer",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: 3,
+                        minWidth: 54,
+                        flexShrink: 0,
+                        position: "relative",
+                        boxShadow: isActive ? "0 0 10px " + t.gold + "55" : "none",
+                        animation: isActive ? "cycleGlow 1.8s ease-in-out infinite" : "none",
+                      }}
+                    >
+                      {isDone ? (
+                        <span style={{ fontSize: 15, color: nodeColor }}>✓</span>
+                      ) : (
+                        <span style={{ fontSize: 15 }}>{step.icon}</span>
+                      )}
+                      <span style={{
+                        fontSize: 9,
+                        fontFamily: fonts.ui,
+                        color: labelColor,
+                        fontWeight: isActive || isDone ? 700 : 400,
+                        lineHeight: 1,
+                        whiteSpace: "nowrap",
+                      }}>
+                        {step.label}
+                      </span>
+                    </button>
+
+                    {/* Connector arrow */}
+                    {i < cycleSteps.length - 1 && (
+                      <div style={{
+                        flex: 1,
+                        height: 2,
+                        background: i < activeIdx || activeIdx === -1
+                          ? t.correct
+                          : t.surface,
+                        position: "relative",
+                        minWidth: 8,
+                      }}>
+                        <span style={{
+                          position: "absolute",
+                          right: -1,
+                          top: "50%",
+                          transform: "translateY(-50%)",
+                          fontSize: 10,
+                          color: i < activeIdx || activeIdx === -1 ? t.correct : t.subtle,
+                          lineHeight: 1,
+                        }}>›</span>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            <style>{`
+              @keyframes cycleGlow {
+                0%, 100% { box-shadow: 0 0 6px var(--glow-color, #0077DD55); }
+                50% { box-shadow: 0 0 14px var(--glow-color, #0077DD99); }
+              }
+            `}</style>
           </div>
-          <div style={{ fontSize: 10, color: t.muted }}>grupos</div>
-        </div>
-      </div>
+        );
+      })()}
 
       {/* ── Sala Cards ──────────────────────────────────────────────────────── */}
       <div style={{

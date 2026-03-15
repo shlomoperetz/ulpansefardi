@@ -6,6 +6,7 @@ import Patrones from "./components/Patrones";
 import Dialogos from "./components/Dialogos";
 import Elemental from "./components/Elemental";
 import Mishnatot from "./components/Mishnatot";
+import SalaNav from "./components/SalaNav";
 import { enableDemoMode, getProgress, markTodayDone } from "./utils/storage";
 import { getActiveMana, getMasteredCount } from "./utils/mana";
 import { WORDS } from "./data/words";
@@ -147,14 +148,28 @@ export default function App() {
         </div>
       </nav>
 
-      <div style={{ paddingTop: 16 }}>
+      {/* Page content — add bottom padding when SalaNav is visible */}
+      <div style={{
+        paddingTop: 16,
+        paddingBottom: (page !== "home" && page !== "elemental") ? 70 : 0,
+      }}>
         {page === "home"      && <Home t={t} onNavigate={setPage} mastered={mastered} mana={mana} />}
         {page === "pasos"     && <Pasos t={t} onBack={goHome} onManaChange={refreshMana} onNavigate={setPage} />}
-        {page === "patrones"  && <Patrones t={t} onBack={goHome} />}
-        {page === "dialogos"  && <Dialogos t={t} onBack={goHome} />}
-        {page === "elemental"   && <Elemental t={t} onBack={goHome} />}
-        {page === "mishnatot"  && <Mishnatot t={t} onBack={goHome} />}
+        {page === "patrones"  && <Patrones t={t} onBack={goHome} onNavigate={setPage} />}
+        {page === "dialogos"  && <Dialogos t={t} onBack={goHome} onNavigate={setPage} />}
+        {page === "elemental" && <Elemental t={t} onBack={goHome} />}
+        {page === "mishnatot" && <Mishnatot t={t} onBack={goHome} onNavigate={setPage} />}
       </div>
+
+      {/* Bottom navigation — shown in all salas except home and elemental */}
+      {page !== "home" && page !== "elemental" && (
+        <SalaNav
+          t={t}
+          page={page}
+          onNavigate={setPage}
+          onBack={goHome}
+        />
+      )}
     </div>
   );
 }
