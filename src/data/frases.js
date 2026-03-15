@@ -134,4 +134,33 @@ export const FRASES_POR_LOTE = {
     { he: "הוּא מְבוּגָר אֲבָל הִיא צָעִירָה", tr: "hu mevugar aval hi tzeira", es: "él es mayor pero ella es joven" },
   ],
 
+  // ── Lote 20 — Números ────────────────────────────────────────────────────────
+  20: [
+    { he: "יֵשׁ אֶחָד",              tr: "yesh ejad",              es: "hay uno" },
+    { he: "שְׁנַיִם אֲנָשִׁים פֹּה",  tr: "shnaim anashim po",      es: "dos personas aquí" },
+    { he: "אֲנִי רוֹצֶה שָׁלוֹשׁ",    tr: "ani rotze shalosh",       es: "yo quiero tres" },
+    { he: "יֵשׁ חָמֵשׁ יָמִים",       tr: "yesh jamesh yamim",       es: "hay cinco días" },
+    { he: "אֲנִי מַכִּיר עֶשֶׂר אֲנָשִׁים", tr: "ani makir eser anashim", es: "yo conozco diez personas" },
+  ],
+
+  // ── Lote 21 — Preguntas ──────────────────────────────────────────────────────
+  21: [
+    { he: "מָה זֶה",                tr: "ma ze",               es: "¿qué es esto?" },
+    { he: "מִי פֹּה",               tr: "mi po",               es: "¿quién está aquí?" },
+    { he: "אֵיפֹה הַבַּיִת",        tr: "eyfo habayt",         es: "¿dónde está la casa?" },
+    { he: "לָמָּה הוּא הוֹלֵךְ",    tr: "lama hu holex",       es: "¿por qué va él?" },
+    { he: "כַּמָּה זְמַן יֵשׁ",     tr: "kama zman yesh",      es: "¿cuánto tiempo hay?" },
+    { he: "אֵיךְ אַתָּה",           tr: "ej ata",              es: "¿cómo estás?" },
+  ],
+
+  // ── Lote 22 — Expresiones ────────────────────────────────────────────────────
+  22: [
+    { he: "שָׁלוֹם, מָה שְׁלוֹמְךָ", tr: "shalom, ma shlomja", es: "hola, ¿cómo estás?" },
+    { he: "תּוֹדָה רַבָּה",          tr: "toda raba",           es: "muchas gracias" },
+    { he: "בְּבַקָּשָׁה",           tr: "bevakasha",           es: "por favor" },
+    { he: "סְלִיחָה, אֵיפֹה הַבַּיִת", tr: "sliha, eyfo habayt", es: "perdona, ¿dónde está la casa?" },
+    { he: "בְּסֵדֶר, יַלָּה",        tr: "beseder, yala",       es: "de acuerdo, ¡vamos!" },
+    { he: "מַזָּל טוֹב, לְהִתְרָאוֹת", tr: "mazal tov, lehitraot", es: "enhorabuena, ¡hasta luego!" },
+  ],
+
 };

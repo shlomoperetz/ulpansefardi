@@ -34,10 +34,10 @@ export const DEMONSTRATIVES = [
 
 export const CORE_VERBS = [
   { he: "לִהְיוֹת",  tr: "lihiot",   es: "ser / estar", binyan: PA },
-  { he: "לִרְצוֹת",  tr: "lirtzot",  es: "querer",      binyan: PA },
-  { he: "לֶאֱהוֹב",  tr: "leehov",   es: "amar",        binyan: PA },
-  { he: "לָדַעַת",   tr: "ladaat",   es: "saber",       binyan: PA },
-  { he: "לָלֶכֶת",   tr: "lalechet", es: "ir",          binyan: PA },
+  { he: "לִרְצוֹת",  tr: "lirtzot",  es: "querer",      binyan: PA, conj: { ms: "רוֹצֶה",   fs: "רוֹצָה",    mp: "רוֹצִים",   fp: "רוֹצוֹת"   } },
+  { he: "לֶאֱהוֹב",  tr: "leehov",   es: "amar",        binyan: PA, conj: { ms: "אוֹהֵב",   fs: "אוֹהֶבֶת",  mp: "אוֹהֲבִים", fp: "אוֹהֲבוֹת" } },
+  { he: "לָדַעַת",   tr: "ladaat",   es: "saber",       binyan: PA, conj: { ms: "יוֹדֵעַ",  fs: "יוֹדַעַת",  mp: "יוֹדְעִים", fp: "יוֹדְעוֹת" } },
+  { he: "לָלֶכֶת",   tr: "lalechet", es: "ir",          binyan: PA, conj: { ms: "הוֹלֵךְ",  fs: "הוֹלֶכֶת",  mp: "הוֹלְכִים", fp: "הוֹלְכוֹת" } },
 ];
 
 export const NOUNS = [
@@ -60,6 +60,46 @@ export const CONNECTORS = [
 
 export const NUCLEUS_CARDS = [
   ...PRONOUNS, ...DEMONSTRATIVES, ...CORE_VERBS, ...NOUNS, ...CONNECTORS,
+];
+
+// ─── Números ──────────────────────────────────────────────────────────────────
+export const NUMBERS = [
+  { he: "אֶחָד",    tr: "ejad",     es: "uno (m)" },
+  { he: "אַחַת",    tr: "ajat",     es: "una (f)" },
+  { he: "שְׁנַיִם", tr: "shnaim",   es: "dos (m)" },
+  { he: "שְׁתַּיִם", tr: "shtaim",   es: "dos (f)" },
+  { he: "שָׁלוֹשׁ", tr: "shalosh",  es: "tres" },
+  { he: "אַרְבַּע", tr: "arba",     es: "cuatro" },
+  { he: "חָמֵשׁ",   tr: "jamesh",   es: "cinco" },
+  { he: "שֵׁשׁ",    tr: "shesh",    es: "seis" },
+  { he: "שֶׁבַע",   tr: "sheva",    es: "siete" },
+  { he: "שְׁמוֹנֶה", tr: "shmone",  es: "ocho" },
+  { he: "תֵּשַׁע",  tr: "tesha",    es: "nueve" },
+  { he: "עֶשֶׂר",   tr: "eser",     es: "diez" },
+];
+
+// ─── Preguntas ────────────────────────────────────────────────────────────────
+export const QUESTIONS = [
+  { he: "מָה",      tr: "ma",       es: "¿qué?" },
+  { he: "מִי",      tr: "mi",       es: "¿quién?" },
+  { he: "אֵיפֹה",   tr: "eyfo",     es: "¿dónde?" },
+  { he: "מָתַי",    tr: "matai",    es: "¿cuándo?" },
+  { he: "לָמָּה",   tr: "lama",     es: "¿por qué?" },
+  { he: "כַּמָּה",  tr: "kama",     es: "¿cuánto?" },
+  { he: "אֵיךְ",    tr: "ej",       es: "¿cómo?" },
+  { he: "אֵיזֶה",   tr: "eyze",     es: "¿cuál?" },
+];
+
+// ─── Expresiones ──────────────────────────────────────────────────────────────
+export const EXPRESSIONS = [
+  { he: "שָׁלוֹם",       tr: "shalom",     es: "hola / adiós / paz" },
+  { he: "תּוֹדָה",        tr: "toda",       es: "gracias" },
+  { he: "בְּבַקָּשָׁה",  tr: "bevakasha",  es: "por favor / de nada" },
+  { he: "סְלִיחָה",      tr: "sliha",      es: "perdón / disculpe" },
+  { he: "בְּסֵדֶר",      tr: "beseder",    es: "de acuerdo / bien" },
+  { he: "יַלָּה",         tr: "yala",       es: "¡vamos! / ¡venga!" },
+  { he: "מַזָּל טוֹב",   tr: "mazal tov",  es: "enhorabuena" },
+  { he: "לְהִתְרָאוֹת",  tr: "lehitraot",  es: "hasta luego" },
 ];
 
 // ─── Adjetivos ────────────────────────────────────────────────────────────────
@@ -112,42 +152,42 @@ export const ADJECTIVES = [
 
 // ─── Verbos ───────────────────────────────────────────────────────────────────
 export const VERBS = [
-  { he: "לֶאֱכוֹל",      tr: "leejol",      es: "comer",       binyan: PA },
-  { he: "לִשְׁתּוֹת",    tr: "lishtot",     es: "beber",       binyan: PA },
-  { he: "לַעֲבוֹד",      tr: "laavod",      es: "trabajar",    binyan: PA },
-  { he: "לִלְמוֹד",      tr: "lilmod",      es: "estudiar",    binyan: PA },
-  { he: "לָגוּר",        tr: "lagur",       es: "vivir",       binyan: PA },
-  { he: "לָבוֹא",        tr: "lavo",        es: "venir",       binyan: PA },
-  { he: "לַחְזוֹר",      tr: "lajzor",      es: "volver",      binyan: PA },
-  { he: "לְהַגִּיעַ",    tr: "lehagia",     es: "llegar",      binyan: HI },
-  { he: "לִנְסוֹעַ",     tr: "linsoa",      es: "viajar",      binyan: PA },
-  { he: "לָקוּם",        tr: "lakum",       es: "levantarse",  binyan: PA },
-  { he: "לִקְרוֹא",      tr: "likro",       es: "leer",        binyan: PA },
-  { he: "לִכְתּוֹב",     tr: "lichtov",     es: "escribir",    binyan: PA },
-  { he: "לְדַבֵּר",      tr: "ledaber",     es: "hablar",      binyan: PI },
-  { he: "לִרְאוֹת",      tr: "lirot",       es: "ver",         binyan: PA },
-  { he: "לְהִסְתַּכֵּל", tr: "lehistakel",  es: "mirar",       binyan: HT },
-  { he: "לִרְצוֹת",      tr: "lirtzot",     es: "querer",      binyan: PA },
-  { he: "לַעֲשׂוֹת",     tr: "laasot",      es: "hacer",       binyan: PA },
-  { he: "לְהָבִין",      tr: "lehavin",     es: "entender",    binyan: HI },
-  { he: "לְהַכִּיר",     tr: "lehakir",     es: "conocer",     binyan: HI },
-  { he: "לְהַרְגִּישׁ",  tr: "lehargish",   es: "sentir",      binyan: HI },
-  { he: "לְהַתְחִיל",    tr: "lehatchil",   es: "empezar",     binyan: HI },
-  { he: "לְהַמְשִׁיךְ",  tr: "lehamshich",  es: "continuar",   binyan: HI },
-  { he: "לְהַפְסִיק",    tr: "lehafsik",    es: "parar",       binyan: HI },
-  { he: "לְשַׁלֵּם",     tr: "leshalem",    es: "pagar",       binyan: PI },
-  { he: "לְחַכּוֹת",     tr: "lechakot",    es: "esperar",     binyan: PI },
-  { he: "לְהִתְקַלֵּחַ", tr: "lehitkaleaj", es: "ducharse",    binyan: HT },
-  { he: "לְהִתְלַבֵּשׁ", tr: "lehitalbesh", es: "vestirse",    binyan: HT },
-  { he: "לְהִתְעוֹרֵר",  tr: "lehitorer",   es: "despertarse", binyan: HT },
-  { he: "לְהִירָדֵם",    tr: "lehiradem",   es: "dormirse",    binyan: NI },
-  { he: "לְהִתְפַּלֵּל", tr: "lehitpalel",  es: "rezar",       binyan: HT },
+  { he: "לֶאֱכוֹל",      tr: "leejol",      es: "comer",       binyan: PA, conj: { ms: "אוֹכֵל",       fs: "אוֹכֶלֶת",      mp: "אוֹכְלִים",      fp: "אוֹכְלוֹת"      } },
+  { he: "לִשְׁתּוֹת",    tr: "lishtot",     es: "beber",       binyan: PA, conj: { ms: "שׁוֹתֶה",       fs: "שׁוֹתָה",        mp: "שׁוֹתִים",        fp: "שׁוֹתוֹת"        } },
+  { he: "לַעֲבוֹד",      tr: "laavod",      es: "trabajar",    binyan: PA, conj: { ms: "עוֹבֵד",        fs: "עוֹבֶדֶת",       mp: "עוֹבְדִים",       fp: "עוֹבְדוֹת"       } },
+  { he: "לִלְמוֹד",      tr: "lilmod",      es: "estudiar",    binyan: PA, conj: { ms: "לוֹמֵד",        fs: "לוֹמֶדֶת",       mp: "לוֹמְדִים",       fp: "לוֹמְדוֹת"       } },
+  { he: "לָגוּר",        tr: "lagur",       es: "vivir",       binyan: PA, conj: { ms: "גָּר",           fs: "גָּרָה",          mp: "גָּרִים",          fp: "גָּרוֹת"          } },
+  { he: "לָבוֹא",        tr: "lavo",        es: "venir",       binyan: PA, conj: { ms: "בָּא",           fs: "בָּאָה",          mp: "בָּאִים",          fp: "בָּאוֹת"          } },
+  { he: "לַחְזוֹר",      tr: "lajzor",      es: "volver",      binyan: PA, conj: { ms: "חוֹזֵר",        fs: "חוֹזֶרֶת",       mp: "חוֹזְרִים",       fp: "חוֹזְרוֹת"       } },
+  { he: "לְהַגִּיעַ",    tr: "lehagia",     es: "llegar",      binyan: HI, conj: { ms: "מַגִּיעַ",      fs: "מַגִּיעָה",       mp: "מַגִּיעִים",       fp: "מַגִּיעוֹת"       } },
+  { he: "לִנְסוֹעַ",     tr: "linsoa",      es: "viajar",      binyan: PA, conj: { ms: "נוֹסֵעַ",       fs: "נוֹסַעַת",        mp: "נוֹסְעִים",        fp: "נוֹסְעוֹת"        } },
+  { he: "לָקוּם",        tr: "lakum",       es: "levantarse",  binyan: PA, conj: { ms: "קָם",            fs: "קָמָה",           mp: "קָמִים",           fp: "קָמוֹת"           } },
+  { he: "לִקְרוֹא",      tr: "likro",       es: "leer",        binyan: PA, conj: { ms: "קוֹרֵא",        fs: "קוֹרֵאת",        mp: "קוֹרְאִים",       fp: "קוֹרְאוֹת"       } },
+  { he: "לִכְתּוֹב",     tr: "lichtov",     es: "escribir",    binyan: PA, conj: { ms: "כּוֹתֵב",        fs: "כּוֹתֶבֶת",       mp: "כּוֹתְבִים",       fp: "כּוֹתְבוֹת"       } },
+  { he: "לְדַבֵּר",      tr: "ledaber",     es: "hablar",      binyan: PI, conj: { ms: "מְדַבֵּר",      fs: "מְדַבֶּרֶת",     mp: "מְדַבְּרִים",     fp: "מְדַבְּרוֹת"     } },
+  { he: "לִרְאוֹת",      tr: "lirot",       es: "ver",         binyan: PA, conj: { ms: "רוֹאֶה",        fs: "רוֹאָה",          mp: "רוֹאִים",          fp: "רוֹאוֹת"          } },
+  { he: "לְהִסְתַּכֵּל", tr: "lehistakel",  es: "mirar",       binyan: HT, conj: { ms: "מִסְתַּכֵּל",   fs: "מִסְתַּכֶּלֶת",  mp: "מִסְתַּכְּלִים",  fp: "מִסְתַּכְּלוֹת"  } },
+  { he: "לִרְצוֹת",      tr: "lirtzot",     es: "querer",      binyan: PA, conj: { ms: "רוֹצֶה",        fs: "רוֹצָה",          mp: "רוֹצִים",          fp: "רוֹצוֹת"          } },
+  { he: "לַעֲשׂוֹת",     tr: "laasot",      es: "hacer",       binyan: PA, conj: { ms: "עוֹשֶׂה",        fs: "עוֹשָׂה",          mp: "עוֹשִׂים",          fp: "עוֹשׂוֹת"          } },
+  { he: "לְהָבִין",      tr: "lehavin",     es: "entender",    binyan: HI, conj: { ms: "מֵבִין",         fs: "מְבִינָה",        mp: "מְבִינִים",        fp: "מְבִינוֹת"        } },
+  { he: "לְהַכִּיר",     tr: "lehakir",     es: "conocer",     binyan: HI, conj: { ms: "מַכִּיר",        fs: "מַכִּירָה",       mp: "מַכִּירִים",       fp: "מַכִּירוֹת"       } },
+  { he: "לְהַרְגִּישׁ",  tr: "lehargish",   es: "sentir",      binyan: HI, conj: { ms: "מַרְגִּישׁ",     fs: "מַרְגִּישָׁה",    mp: "מַרְגִּישִׁים",    fp: "מַרְגִּישׁוֹת"    } },
+  { he: "לְהַתְחִיל",    tr: "lehatchil",   es: "empezar",     binyan: HI, conj: { ms: "מַתְחִיל",       fs: "מַתְחִילָה",      mp: "מַתְחִילִים",      fp: "מַתְחִילוֹת"      } },
+  { he: "לְהַמְשִׁיךְ",  tr: "lehamshich",  es: "continuar",   binyan: HI, conj: { ms: "מַמְשִׁיךְ",     fs: "מַמְשִׁיכָה",     mp: "מַמְשִׁיכִים",     fp: "מַמְשִׁיכוֹת"     } },
+  { he: "לְהַפְסִיק",    tr: "lehafsik",    es: "parar",       binyan: HI, conj: { ms: "מַפְסִיק",       fs: "מַפְסִיקָה",      mp: "מַפְסִיקִים",      fp: "מַפְסִיקוֹת"      } },
+  { he: "לְשַׁלֵּם",     tr: "leshalem",    es: "pagar",       binyan: PI, conj: { ms: "מְשַׁלֵּם",      fs: "מְשַׁלֶּמֶת",    mp: "מְשַׁלְּמִים",    fp: "מְשַׁלְּמוֹת"    } },
+  { he: "לְחַכּוֹת",     tr: "lechakot",    es: "esperar",     binyan: PI, conj: { ms: "מְחַכֶּה",       fs: "מְחַכָּה",        mp: "מְחַכִּים",        fp: "מְחַכּוֹת"        } },
+  { he: "לְהִתְקַלֵּחַ", tr: "lehitkaleaj", es: "ducharse",    binyan: HT, conj: { ms: "מִתְקַלֵּחַ",    fs: "מִתְקַלַּחַת",   mp: "מִתְקַלְּחִים",   fp: "מִתְקַלְּחוֹת"   } },
+  { he: "לְהִתְלַבֵּשׁ", tr: "lehitalbesh", es: "vestirse",    binyan: HT, conj: { ms: "מִתְלַבֵּשׁ",    fs: "מִתְלַבֶּשֶׁת",  mp: "מִתְלַבְּשִׁים",  fp: "מִתְלַבְּשׁוֹת"  } },
+  { he: "לְהִתְעוֹרֵר",  tr: "lehitorer",   es: "despertarse", binyan: HT, conj: { ms: "מִתְעוֹרֵר",     fs: "מִתְעוֹרֶרֶת",   mp: "מִתְעוֹרְרִים",   fp: "מִתְעוֹרְרוֹת"   } },
+  { he: "לְהִירָדֵם",    tr: "lehiradem",   es: "dormirse",    binyan: NI, conj: { ms: "נִרְדָּם",        fs: "נִרְדֶּמֶת",      mp: "נִרְדָּמִים",      fp: "נִרְדָּמוֹת"      } },
+  { he: "לְהִתְפַּלֵּל", tr: "lehitpalel",  es: "rezar",       binyan: HT, conj: { ms: "מִתְפַּלֵּל",    fs: "מִתְפַּלֶּלֶת",  mp: "מִתְפַּלְּלִים",  fp: "מִתְפַּלְּלוֹת"  } },
 ];
 
 // ─── ALL_CARDS (deduplicado por clave `he`) ───────────────────────────────────
 const _seen = new Set();
 export const ALL_CARDS = [
-  ...NUCLEUS_CARDS, ...ADJECTIVES, ...VERBS,
+  ...NUCLEUS_CARDS, ...NUMBERS, ...QUESTIONS, ...EXPRESSIONS, ...ADJECTIVES, ...VERBS,
 ].filter(c => {
   if (_seen.has(c.he)) return false;
   _seen.add(c.he);
@@ -176,6 +216,11 @@ export const LOTES = [
   { id: 13, label: "Adj — estado 2",         nivel: 1, cards: ADJECTIVES.slice(14, 20),  requires: [12] },
   { id: 14, label: "Adj — descripción 1",    nivel: 1, cards: ADJECTIVES.slice(20, 25),  requires: [13] },
   { id: 15, label: "Adj — descripción 2",    nivel: 1, cards: ADJECTIVES.slice(25),      requires: [14] },
+
+  // NIVEL 1 — Vocabulario extra (se desbloquean tras Capa 4)
+  { id: 20, label: "Números 1-10",      nivel: 1, cards: NUMBERS,      requires: [5] },
+  { id: 21, label: "Preguntas",         nivel: 1, cards: QUESTIONS,    requires: [5] },
+  { id: 22, label: "Expresiones",       nivel: 1, cards: EXPRESSIONS,  requires: [5] },
 
   // NIVEL 2 — Repasos por categoría
   { id: 16, label: "Repaso Núcleo",     nivel: 2, cards: NUCLEUS_CARDS, isRepaso: true, requires: [1, 2, 3, 4, 5] },

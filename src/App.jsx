@@ -16,7 +16,7 @@ export default function App() {
     setPage(dest);
   }
 
-  const topbarBg = isDark ? "rgba(10,10,10,0.96)" : "rgba(255,255,255,0.96)";
+  const topbarBg = isDark ? "rgba(6,14,24,0.97)" : "rgba(240,247,255,0.97)";
 
   const navStyle = {
     position: "fixed", top: 0, left: 0, right: 0, zIndex: 200,

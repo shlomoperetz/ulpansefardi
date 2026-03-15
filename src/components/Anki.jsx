@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { LOTES, ALL_CARDS, BINYAN_COLORS } from "../data/cards";
 import { FRASES_POR_LOTE } from "../data/frases";
 import { fonts } from "../theme";
@@ -70,6 +70,27 @@ function generateChoices(correctCard, cardPool) {
   return shuffle([base, ...opts.slice(0, 3)]);
 }
 
+function ConjTable({ conj, t }) {
+  if (!conj) return null;
+  const rows = [
+    [{ label: "הוא / אתה / אני ♂", form: conj.ms }, { label: "היא / את / אני ♀", form: conj.fs }],
+    [{ label: "הם / אתם ♂",        form: conj.mp }, { label: "הן / אתן ♀",       form: conj.fp }],
+  ];
+  return (
+    <div style={{ width: "100%", marginTop: 12, borderTop: "1px solid " + t.border, paddingTop: 12 }}>
+      <div style={{ fontSize: 10, color: t.subtle, letterSpacing: 1, textTransform: "uppercase", fontFamily: "var(--font-ui, sans-serif)", marginBottom: 8, textAlign: "center" }}>הווה — presente</div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+        {rows.flat().map(({ label, form }) => (
+          <div key={label} style={{ background: t.surface, borderRadius: 8, padding: "8px 10px", textAlign: "center" }}>
+            <div style={{ fontSize: 9, color: t.subtle, fontFamily: "var(--font-ui, sans-serif)", marginBottom: 4, direction: "rtl", lineHeight: 1.2 }}>{label}</div>
+            <div style={{ fontSize: 20, fontFamily: "Noto Serif Hebrew, serif", color: t.text, direction: "rtl", lineHeight: 1.4 }}>{form}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function Anki({ t, loteId, onBack }) {
   const lote     = LOTES.find(l => l.id === loteId);
   const progress = getProgress();
@@ -106,7 +127,43 @@ export default function Anki({ t, loteId, onBack }) {
   // SRS: errores por carta en esta sesión (para calcular calidad)
   const [sessionWrongs] = useState(() => new Map());
 
-  const inputRef = useRef(null);
+  const inputRef  = useRef(null);
+
+  // ── TTS ────────────────────────────────────────────────────────────────
+  const synthRef = useRef(null);
+  const voiceRef = useRef(null);
+  const [ttsOk, setTtsOk] = useState(false);
+
+  useEffect(() => {
+    const synth = window.speechSynthesis;
+    if (!synth) return;
+    synthRef.current = synth;
+    function loadVoices() {
+      const v = synth.getVoices().find(v => v.lang.startsWith("he"));
+      if (v) { voiceRef.current = v; setTtsOk(true); }
+    }
+    loadVoices();
+    synth.addEventListener("voiceschanged", loadVoices);
+    return () => synth.removeEventListener("voiceschanged", loadVoices);
+  }, []);
+
+  const speak = useCallback((text) => {
+    if (!synthRef.current || !voiceRef.current) return;
+    synthRef.current.cancel();
+    const utt  = new SpeechSynthesisUtterance(text);
+    utt.voice  = voiceRef.current;
+    utt.lang   = "he-IL";
+    utt.rate   = 0.85;
+    synthRef.current.speak(utt);
+  }, []);
+
+  const SpeakBtn = ({ text, size = 15 }) => !ttsOk ? null : (
+    <button
+      onClick={(e) => { e.stopPropagation(); speak(text); }}
+      title="Escuchar"
+      style={{ background: "none", border: "none", cursor: "pointer", color: "#d4af37", fontSize: size, padding: "2px 4px", lineHeight: 1 }}
+    >🔊</button>
+  );
 
   const active    = cards.filter(c => c.correct < MASTERY);
   const current   = active[index % Math.max(active.length, 1)];
@@ -312,8 +369,11 @@ export default function Anki({ t, loteId, onBack }) {
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {frases.map((f, i) => (
-                <div key={i} style={{ background: t.surface, borderRadius: 12, padding: "16px 20px" }}>
-                  <div style={{ fontSize: 22, fontWeight: "bold", direction: "rtl", color: t.text, lineHeight: 1.4 }}>{f.he}</div>
+                <div key={i} style={{ background: t.surface, borderRadius: 16, padding: "16px 20px" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 8 }}>
+                    <div style={{ fontSize: 22, fontWeight: "bold", direction: "rtl", color: t.text, lineHeight: 1.4, flex: 1, textAlign: "right" }}>{f.he}</div>
+                    <SpeakBtn text={f.he} size={14} />
+                  </div>
                   <div style={{ fontSize: 12, color: t.muted, fontStyle: "italic", fontFamily: fonts.ui, marginTop: 4 }}>{f.tr}</div>
                   <div style={{ fontSize: 15, color: t.text, fontFamily: fonts.ui, marginTop: 6 }}>{f.es}</div>
                 </div>
@@ -325,12 +385,12 @@ export default function Anki({ t, loteId, onBack }) {
         <div style={{ display: "flex", flexDirection: "column", gap: 10, width: "100%", maxWidth: 320, marginTop: 8 }}>
           {!isReview && nextLote && (
             <button onClick={() => onBack(nextLote.id)}
-              style={{ background: t.gold, border: "none", borderRadius: 10, padding: "13px 32px", color: t.bg, fontSize: 14, cursor: "pointer", fontFamily: fonts.ui, fontWeight: "bold" }}>
+              style={{ background: t.gold, border: "none", borderRadius: 14, padding: "13px 32px", color: "#fff", fontSize: 14, cursor: "pointer", fontFamily: fonts.ui, fontWeight: "bold" }}>
               Siguiente: {nextLote.label} →
             </button>
           )}
           <button onClick={() => onBack()}
-            style={{ background: "none", border: "1px solid " + t.border, borderRadius: 10, padding: "12px 32px", color: t.muted, fontSize: 13, cursor: "pointer", fontFamily: fonts.ui }}>
+            style={{ background: "none", border: "1px solid " + t.border, borderRadius: 14, padding: "12px 32px", color: t.muted, fontSize: 13, cursor: "pointer", fontFamily: fonts.ui }}>
             Volver al inicio
           </button>
         </div>
@@ -351,19 +411,24 @@ export default function Anki({ t, loteId, onBack }) {
           <span style={{ fontSize: 13, color: t.muted, fontFamily: fonts.ui }}>{p1Done.size}/{cards.length}</span>
         </div>
 
-        <div style={{ width: "100%", height: 6, background: t.surface, borderRadius: 3, marginBottom: 32, overflow: "hidden" }}>
-          <div style={{ height: "100%", width: p1Pct + "%", background: "linear-gradient(90deg," + t.gold + "," + t.goldLight + ")", borderRadius: 3, transition: "width 0.5s" }} />
+        <div style={{ width: "100%", height: 7, background: t.surface, borderRadius: 6, marginBottom: 32, overflow: "hidden" }}>
+          <div style={{ height: "100%", width: p1Pct + "%", background: "linear-gradient(90deg," + t.gold + "," + t.goldLight + ")", borderRadius: 6, transition: "width 0.5s" }} />
         </div>
 
-        <div style={{ background: t.card, border: "1px solid " + t.border, borderRadius: 16, padding: "32px 28px", display: "flex", flexDirection: "column", alignItems: "center", gap: 16, boxShadow: "0 8px 40px #00000022" }}>
+        <div style={{ background: t.card, border: "1px solid " + t.border, borderRadius: 22, padding: "32px 28px", display: "flex", flexDirection: "column", alignItems: "center", gap: 16, boxShadow: "0 8px 40px rgba(0,80,200,0.10)" }}>
           <div style={{ fontSize: 11, color: t.subtle, letterSpacing: 1, textTransform: "uppercase", alignSelf: "flex-end", fontFamily: fonts.ui }}>{p1Active.length} restantes</div>
           <div style={{ fontSize: 12, color: t.muted, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui }}>¿cuál es la escritura correcta?</div>
-          <div style={{ fontSize: 28, color: t.text, fontFamily: fonts.ui, fontWeight: "bold" }}>{question?.es}</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+            <div style={{ fontSize: 28, color: t.text, fontFamily: fonts.ui, fontWeight: "bold" }}>{question?.es}</div>
+            <SpeakBtn text={question?.he || ""} />
+          </div>
           {question?.tr && <div style={{ fontSize: 13, color: t.subtle, fontStyle: "italic", fontFamily: fonts.ui }}>{question.tr}</div>}
           {question?.binyan && (() => {
             const color = BINYAN_COLORS[question.binyan];
             return <span style={{ fontSize: 12, padding: "2px 12px", borderRadius: 12, fontFamily: fonts.serif, background: color + "22", color, border: "1px solid " + color + "55" }}>{question.binyan}</span>;
           })()}
+
+          <ConjTable conj={question?.conj} t={t} />
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, width: "100%", marginTop: 8 }}>
             {(choices || []).map((opt, i) => {
@@ -379,7 +444,7 @@ export default function Anki({ t, loteId, onBack }) {
               }
               return (
                 <button key={i} onClick={() => handleChoice(opt)}
-                  style={{ background: bgColor, border: "1px solid " + borderColor, borderRadius: 12, padding: "18px 8px", cursor: choiceFeedback ? "default" : "pointer", textAlign: "center", transition: "all 0.2s", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  style={{ background: bgColor, border: "1px solid " + borderColor, borderRadius: 16, padding: "18px 8px", cursor: choiceFeedback ? "default" : "pointer", textAlign: "center", transition: "all 0.2s", display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <span style={{ fontSize: 28, fontFamily: fonts.serif, direction: "rtl", color: textColor, lineHeight: 1.2 }}>{opt}</span>
                 </button>
               );
@@ -409,22 +474,27 @@ export default function Anki({ t, loteId, onBack }) {
         <span style={{ fontSize: 13, color: t.muted, fontFamily: fonts.ui }}>{mastered}/{cards.length}</span>
       </div>
 
-      <div style={{ width: "100%", height: 6, background: t.surface, borderRadius: 3, marginBottom: 8, overflow: "hidden" }}>
-        <div style={{ height: "100%", width: pct + "%", background: "linear-gradient(90deg," + t.gold + "," + t.goldLight + ")", borderRadius: 3, transition: "width 0.5s" }} />
+      <div style={{ width: "100%", height: 7, background: t.surface, borderRadius: 6, marginBottom: 8, overflow: "hidden" }}>
+        <div style={{ height: "100%", width: pct + "%", background: "linear-gradient(90deg," + t.gold + "," + t.goldLight + ")", borderRadius: 6, transition: "width 0.5s" }} />
       </div>
       <div style={{ fontSize: 10, color: t.subtle, fontFamily: fonts.ui, textAlign: "right", marginBottom: 24, letterSpacing: 1, textTransform: "uppercase" }}>
         {sessionLabel}
       </div>
 
-      <div style={{ background: t.card, border: "1px solid " + (feedback === "correct" ? t.correct : feedback === "wrong" ? t.wrong : t.border), borderRadius: 16, padding: "36px 32px", display: "flex", flexDirection: "column", alignItems: "center", gap: 16, transition: "border-color 0.3s", boxShadow: "0 8px 40px #00000022" }}>
+      <div style={{ background: t.card, border: "1px solid " + (feedback === "correct" ? t.correct : feedback === "wrong" ? t.wrong : t.border), borderRadius: 22, padding: "36px 32px", display: "flex", flexDirection: "column", alignItems: "center", gap: 16, transition: "border-color 0.3s", boxShadow: "0 8px 40px rgba(0,80,200,0.10)" }}>
         <div style={{ fontSize: 11, color: t.subtle, letterSpacing: 1, textTransform: "uppercase", alignSelf: "flex-end", fontFamily: fonts.ui }}>{active.length} restantes</div>
         <div style={{ fontSize: 12, color: t.muted, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui }}>{phase === 2 ? "¿Qué significa?" : "¿Cómo se dice en hebreo?"}</div>
-        <div style={{ fontSize: 36, fontWeight: "bold", color: t.text, textAlign: "center", lineHeight: 1.3, direction: "auto" }}>{question}</div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+          <div style={{ fontSize: 36, fontWeight: "bold", color: t.text, textAlign: "center", lineHeight: 1.3, direction: "auto" }}>{question}</div>
+          {phase === 2 && <SpeakBtn text={question} size={18} />}
+        </div>
 
         {current?.binyan && (() => {
           const color = BINYAN_COLORS[current.binyan];
           return <span style={{ fontSize: 12, padding: "2px 12px", borderRadius: 12, fontFamily: fonts.serif, background: color + "22", color, border: "1px solid " + color + "55" }}>{current.binyan}</span>;
         })()}
+
+        {phase === 2 && <ConjTable conj={current?.conj} t={t} />}
 
         {phase === 2 && current && (
           <button style={{ background: "none", border: "1px solid " + t.border, color: t.muted, fontSize: 12, padding: "4px 14px", borderRadius: 20, cursor: "pointer", fontFamily: fonts.ui }} onClick={() => setShowTr(v => !v)}>
@@ -436,11 +506,11 @@ export default function Anki({ t, loteId, onBack }) {
           <>
             <div style={{ display: "flex", width: "100%", gap: 8, marginTop: 8 }}>
               <input ref={inputRef} value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && submit()}
-                style={{ flex: 1, background: t.bg, border: "1px solid " + t.border, borderRadius: 10, padding: "12px 16px", color: t.text, fontSize: 16, fontFamily: fonts.serif, outline: "none" }}
+                style={{ flex: 1, background: t.bg, border: "1px solid " + t.border, borderRadius: 14, padding: "12px 16px", color: t.text, fontSize: 16, fontFamily: fonts.serif, outline: "none" }}
                 placeholder={phase === 2 ? "escribe en español..." : "escribe en hebreo..."}
                 dir={phase === 3 ? "rtl" : "ltr"} autoComplete="off" autoCorrect="off" spellCheck="false"
               />
-              <button onClick={submit} style={{ background: t.gold, border: "none", borderRadius: 10, padding: "12px 18px", color: t.bg, fontSize: 18, fontWeight: "bold", cursor: "pointer" }}>→</button>
+              <button onClick={submit} style={{ background: t.gold, border: "none", borderRadius: 14, padding: "12px 18px", color: "#fff", fontSize: 18, fontWeight: "bold", cursor: "pointer" }}>→</button>
             </div>
 
             {phase === 3 && (
@@ -470,16 +540,20 @@ export default function Anki({ t, loteId, onBack }) {
               <span style={{ fontSize: 13, color: t.muted, fontStyle: "italic", fontFamily: fonts.ui }}>{current.tr}</span>
             )}
             {feedback === "wrong" && (
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, padding: "16px 24px", background: t.bg, borderRadius: 10, width: "100%", textAlign: "center" }}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, padding: "16px 24px", background: t.bg, borderRadius: 14, width: "100%", textAlign: "center" }}>
                 <div style={{ width: "100%" }}>
                   <span style={{ fontSize: 11, color: t.subtle, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui }}>Tu respuesta</span>
                   <div style={{ fontSize: 20, color: t.wrong, fontWeight: "bold", direction: "auto", marginTop: 4, textDecoration: "line-through", opacity: 0.8 }}>{lastInput}</div>
                 </div>
                 <div style={{ width: "100%", borderTop: "1px solid " + t.border, paddingTop: 12 }}>
                   <span style={{ fontSize: 11, color: t.subtle, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui }}>Correcto</span>
-                  <div style={{ fontSize: 24, color: t.text, fontWeight: "bold", direction: "auto", marginTop: 4 }}>{answer}</div>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 4 }}>
+                    <div style={{ fontSize: 24, color: t.text, fontWeight: "bold", direction: "auto" }}>{answer}</div>
+                    <SpeakBtn text={current?.he || ""} size={16} />
+                  </div>
                   {phase === 2 && <span style={{ fontSize: 13, color: t.muted, fontStyle: "italic", fontFamily: fonts.ui }}>{current.tr}</span>}
                 </div>
+                {phase === 3 && <ConjTable conj={current?.conj} t={t} />}
               </div>
             )}
             {feedback === "wrong" && (

@@ -27,7 +27,7 @@ export default function Landing({ t, onNavigate }) {
 
   const niveles = [
     { nivel: 0, label: "Núcleo — palabras ancla" },
-    { nivel: 1, label: "Verbos y adjetivos" },
+    { nivel: 1, label: "Verbos, adjetivos y vocabulario" },
     { nivel: 2, label: "Repaso por categoría" },
     { nivel: 3, label: "Repaso final" },
   ];
@@ -52,15 +52,16 @@ export default function Landing({ t, onNavigate }) {
       <div
         onClick={() => !locked && onNavigate("anki", lote.id)}
         style={{
-          background: t.card, borderRadius: 12, padding: "14px 18px",
+          background: t.card, borderRadius: 16, padding: "14px 18px",
           border: "1px solid " + (hasDue ? t.gold : done ? t.gold + "66" : t.border),
           cursor: locked ? "not-allowed" : "pointer",
           opacity: locked ? 0.35 : 1,
           display: "flex", alignItems: "center", justifyContent: "space-between",
-          transition: "border-color 0.2s",
+          transition: "border-color 0.2s, box-shadow 0.2s",
+          boxShadow: hasDue ? "0 2px 12px rgba(0,120,255,0.12)" : "none",
         }}
-        onMouseEnter={e => { if (!locked) e.currentTarget.style.borderColor = t.gold; }}
-        onMouseLeave={e => { e.currentTarget.style.borderColor = hasDue ? t.gold : done ? t.gold + "66" : t.border; }}
+        onMouseEnter={e => { if (!locked) { e.currentTarget.style.borderColor = t.gold; e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,120,255,0.15)"; } }}
+        onMouseLeave={e => { e.currentTarget.style.borderColor = hasDue ? t.gold : done ? t.gold + "66" : t.border; e.currentTarget.style.boxShadow = hasDue ? "0 2px 12px rgba(0,120,255,0.12)" : "none"; }}
       >
         <div>
           <div style={{ fontSize: 14, color: t.text, fontWeight: done ? "bold" : "normal", display: "flex", alignItems: "center", gap: 6 }}>
@@ -96,7 +97,7 @@ export default function Landing({ t, onNavigate }) {
   const sectionBtn = (onClick, hebrew, tr, title, sub, open) => (
     <button onClick={onClick} style={{
       width: "100%", background: t.card, border: "1px solid " + t.border,
-      borderRadius: 14, padding: "20px 24px", cursor: "pointer",
+      borderRadius: 18, padding: "20px 24px", cursor: "pointer",
       display: "flex", alignItems: "center", justifyContent: "space-between",
       fontFamily: fonts.serif, color: t.text, marginBottom: 12,
     }}>
@@ -115,13 +116,13 @@ export default function Landing({ t, onNavigate }) {
         <h1 style={{ fontSize: 48, fontWeight: "bold", color: t.gold, margin: 0, direction: "rtl" }}>אולפן ספרדי</h1>
         <p style={{ fontSize: 18, color: t.muted, marginTop: 8 }}>ulpan sefardi</p>
 
-        <div style={{ marginTop: 40, background: t.card, border: "1px solid " + t.border, borderRadius: 16, padding: "28px 32px" }}>
+        <div style={{ marginTop: 40, background: t.card, border: "1px solid " + t.border, borderRadius: 22, padding: "28px 32px", boxShadow: "0 4px 24px rgba(0,120,255,0.07)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
             <span style={{ fontSize: 13, color: t.muted, fontFamily: fonts.ui }}>Progreso total</span>
             <span style={{ fontSize: 13, color: t.gold, fontFamily: fonts.ui }}>{mastered}/{ALL_CARDS.length} palabras</span>
           </div>
-          <div style={{ width: "100%", height: 6, background: t.surface, borderRadius: 3, overflow: "hidden" }}>
-            <div style={{ height: "100%", width: pct + "%", background: "linear-gradient(90deg," + t.gold + "," + t.goldLight + ")", borderRadius: 3, transition: "width 0.5s" }} />
+          <div style={{ width: "100%", height: 7, background: t.surface, borderRadius: 6, overflow: "hidden" }}>
+            <div style={{ height: "100%", width: pct + "%", background: "linear-gradient(90deg," + t.gold + "," + t.goldLight + ")", borderRadius: 6, transition: "width 0.5s" }} />
           </div>
           <div style={{ display: "flex", justifyContent: "space-around", marginTop: 20 }}>
             <div style={{ textAlign: "center" }}>
@@ -158,7 +159,7 @@ export default function Landing({ t, onNavigate }) {
             <button onClick={() => onNavigate("elemental")} style={{
               width: "100%", background: t.card,
               border: "1px solid " + (allDone ? t.gold : t.border),
-              borderRadius: 14, padding: "20px 24px", cursor: "pointer",
+              borderRadius: 18, padding: "20px 24px", cursor: "pointer",
               display: "flex", alignItems: "center", justifyContent: "space-between",
               fontFamily: fonts.serif, color: t.text, marginBottom: 12,
             }}>
@@ -196,13 +197,13 @@ export default function Landing({ t, onNavigate }) {
                       key={l.id}
                       onClick={() => onNavigate("lilmod", l.id)}
                       style={{
-                        background: t.card, borderRadius: 12, padding: "14px 18px",
+                        background: t.card, borderRadius: 16, padding: "14px 18px",
                         border: "1px solid " + t.border, cursor: "pointer",
                         display: "flex", alignItems: "center", justifyContent: "space-between",
                         transition: "border-color 0.2s",
                       }}
-                      onMouseEnter={e => e.currentTarget.style.borderColor = t.gold}
-                      onMouseLeave={e => e.currentTarget.style.borderColor = t.border}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = t.gold; e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,120,255,0.12)"; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = t.border; e.currentTarget.style.boxShadow = "none"; }}
                     >
                       <div>
                         <div style={{ fontSize: 14, color: t.text }}>{l.label}</div>
@@ -262,7 +263,7 @@ export default function Landing({ t, onNavigate }) {
             ) : (
               <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
                 {frasesDesbloqueadas.map((f, i) => (
-                  <div key={i} style={{ background: t.card, borderRadius: 12, padding: "14px 20px", borderLeft: "3px solid " + t.gold + "55" }}>
+                  <div key={i} style={{ background: t.card, borderRadius: 16, padding: "14px 20px", borderLeft: "3px solid " + t.gold + "88" }}>
                     <div style={{ fontSize: 20, fontWeight: "bold", direction: "rtl", color: t.text, lineHeight: 1.4 }}>{f.he}</div>
                     <div style={{ fontSize: 11, color: t.muted, fontStyle: "italic", fontFamily: fonts.ui, marginTop: 3 }}>{f.tr}</div>
                     <div style={{ fontSize: 13, color: t.muted, fontFamily: fonts.ui, marginTop: 5 }}>{f.es}</div>
@@ -274,7 +275,7 @@ export default function Landing({ t, onNavigate }) {
         )}
 
         {/* ── 5. Dikduk (próximamente) ── */}
-        <div style={{ background: t.card, border: "1px solid " + t.border, borderRadius: 14, padding: "20px 24px", opacity: 0.45, marginTop: 8 }}>
+        <div style={{ background: t.card, border: "1px solid " + t.border, borderRadius: 18, padding: "20px 24px", opacity: 0.45, marginTop: 8 }}>
           <div style={{ fontSize: 20, color: t.gold }}>דִּקְדּוּק <span style={{ fontSize: 11, color: t.muted }}>dikduk</span></div>
           <div style={{ fontSize: 15, fontWeight: "bold", marginTop: 4 }}>Gramatica</div>
           <div style={{ fontSize: 12, color: t.muted, marginTop: 2, fontFamily: fonts.ui }}>Proximamente</div>
