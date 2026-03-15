@@ -399,7 +399,7 @@ function Phase3({ t, dialogue, onComplete, tts }) {
 }
 
 // ── Dialogue Detail ──────────────────────────────────────────────────────────
-function DialogueDetail({ t, dialogue, onBack, masteredCount }) {
+function DialogueDetail({ t, dialogue, onBack, groupsUnlocked }) {
   const tts = useTTS();
   const progress = getProgress();
   const dProg = progress.dialogues?.[dialogue.id] || { phase: 1, passed: false };
@@ -416,7 +416,7 @@ function DialogueDetail({ t, dialogue, onBack, masteredCount }) {
     onBack();
   }
 
-  const isLocked = masteredCount < dialogue.unlocksAt;
+  const isLocked = groupsUnlocked < dialogue.unlocksAtGroup;
 
   return (
     <div style={{
@@ -468,7 +468,8 @@ function DialogueDetail({ t, dialogue, onBack, masteredCount }) {
 export default function Dialogos({ t, onBack }) {
   const [selected, setSelected] = useState(null);
   const progress = getProgress();
-  const masteredCount = Object.values(progress.words || {}).filter(w => w.masteredAt).length;
+  const unlockedGroups = progress.unlockedGroups || [1];
+  const groupsUnlocked = unlockedGroups.length;
 
   if (selected) {
     return (
@@ -476,7 +477,7 @@ export default function Dialogos({ t, onBack }) {
         t={t}
         dialogue={selected}
         onBack={() => setSelected(null)}
-        masteredCount={masteredCount}
+        groupsUnlocked={groupsUnlocked}
       />
     );
   }
@@ -487,12 +488,12 @@ export default function Dialogos({ t, onBack }) {
       fontFamily: fonts.ui, color: t.text,
     }}>
       <div style={{ fontSize: 12, color: t.muted, marginBottom: 20 }}>
-        {masteredCount} palabras dominadas · Desbloquea diálogos aprendiendo más
+        {groupsUnlocked} grupos desbloqueados
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {DIALOGUES.map(d => {
-          const isLocked = masteredCount < d.unlocksAt;
+          const isLocked = groupsUnlocked < d.unlocksAtGroup;
           const dProg = progress.dialogues?.[d.id];
           const phase = dProg?.phase || 1;
           const passed = dProg?.passed;
@@ -528,7 +529,7 @@ export default function Dialogos({ t, onBack }) {
                 </div>
                 <div style={{ fontSize: 12, color: t.muted }}>
                   {isLocked
-                    ? "Necesitas " + d.unlocksAt + " palabras para desbloquear"
+                    ? "Desbloquea el grupo " + d.unlocksAtGroup + " para acceder"
                     : passed
                       ? "✓ completado · Fase " + phase + "/3"
                       : dProg

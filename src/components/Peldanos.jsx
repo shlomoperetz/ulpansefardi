@@ -103,7 +103,7 @@ export default function Peldanos({ t, onBack, onManaChange }) {
   const [progress, setProgress] = useState(() => getProgress());
   const [canUnlock, setCanUnlock] = useState(false);
   const [nextGroup, setNextGroup] = useState(null);
-  const [unlockPreview, setUnlockPreview] = useState(null);
+  const [unlockBanner, setUnlockBanner] = useState(null);
 
   // Build queue on mount
   useEffect(() => {
@@ -164,9 +164,16 @@ export default function Peldanos({ t, onBack, onManaChange }) {
     if (!nextGroup) return;
     unlockGroup(nextGroup);
     onManaChange?.();
-    const preview = getWordsForGroup(nextGroup);
-    setUnlockPreview(preview);
+    // Start a new session with the newly unlocked words
+    const newWords = getWordsForGroup(nextGroup).sort(() => Math.random() - 0.5);
+    setQueue(newWords);
+    setCurrentIndex(0);
+    setFlipped(false);
+    setDone(false);
+    setSessionStats({ know: 0, partial: 0, dont: 0 });
+    setUnlockBanner(nextGroup);
     setCanUnlock(false);
+    setTimeout(() => setUnlockBanner(null), 3000);
   }
 
   const groupNum = currentWord?.group;
@@ -209,47 +216,6 @@ export default function Peldanos({ t, onBack, onManaChange }) {
   if (done) {
     const total = sessionStats.know + sessionStats.partial + sessionStats.dont;
     const activeMana = getActiveMana(progress, WORDS);
-
-    if (unlockPreview) {
-      return (
-        <div style={{
-          maxWidth: 480, margin: "0 auto", padding: "0 16px 80px",
-          fontFamily: fonts.ui, color: t.text,
-        }}>
-          <div style={{ textAlign: "center", paddingTop: 32, marginBottom: 24 }}>
-            <div style={{ fontSize: 40, marginBottom: 10 }}>🔓</div>
-            <h2 style={{ fontSize: 20, color: t.text, fontFamily: fonts.serif, margin: "0 0 6px" }}>
-              Grupo {nextGroup ? nextGroup - 1 : ""} desbloqueado
-            </h2>
-            <p style={{ color: t.muted, fontSize: 13 }}>Estas son las nuevas palabras:</p>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 28 }}>
-            {unlockPreview.map(w => (
-              <div key={w.id} style={{
-                background: t.card, border: "1px solid " + t.border,
-                borderRadius: 10, padding: "12px 16px",
-                display: "flex", justifyContent: "space-between", alignItems: "center",
-              }}>
-                <span style={{ fontSize: 22, fontFamily: fonts.serif, direction: "rtl", color: t.text }}>
-                  {w.he}
-                </span>
-                <span style={{ fontSize: 13, color: t.muted }}>{w.es}</span>
-              </div>
-            ))}
-          </div>
-          <button
-            onClick={onBack}
-            style={{
-              width: "100%", background: t.gold, border: "none",
-              borderRadius: 10, padding: "14px", color: t.bg,
-              fontSize: 14, cursor: "pointer",
-            }}
-          >
-            ¡Volver al inicio!
-          </button>
-        </div>
-      );
-    }
 
     return (
       <div style={{
@@ -338,6 +304,18 @@ export default function Peldanos({ t, onBack, onManaChange }) {
       maxWidth: 480, margin: "0 auto", padding: "0 16px 80px",
       fontFamily: fonts.ui, color: t.text,
     }}>
+      {/* Unlock banner */}
+      {unlockBanner && (
+        <div style={{
+          background: t.gold + "22", border: "1px solid " + t.gold + "66",
+          borderRadius: 10, padding: "10px 16px", marginBottom: 16,
+          display: "flex", alignItems: "center", gap: 8,
+          fontSize: 13, color: t.gold,
+        }}>
+          🔓 ¡Grupo {unlockBanner} desbloqueado! Aquí van las palabras nuevas.
+        </div>
+      )}
+
       {/* Header */}
       <div style={{
         display: "flex", justifyContent: "space-between",

@@ -3,7 +3,7 @@ export const DIALOGUES = [
     id: "intro",
     title: "הִתְכַּנְּסוּת",
     titleEs: "Presentación",
-    unlocksAt: 20,
+    unlocksAtGroup: 1,
     lines: [
       {
         speaker: "א",
@@ -48,7 +48,7 @@ export const DIALOGUES = [
     id: "want-go",
     title: "לְאָן אַתָּה הוֹלֵךְ?",
     titleEs: "¿Adónde vas?",
-    unlocksAt: 35,
+    unlocksAtGroup: 3,
     lines: [
       {
         speaker: "א",
@@ -105,7 +105,7 @@ export const DIALOGUES = [
     id: "israel-talk",
     title: "עַל יִשְׂרָאֵל",
     titleEs: "Hablando de Israel",
-    unlocksAt: 50,
+    unlocksAtGroup: 6,
     lines: [
       {
         speaker: "א",
@@ -162,7 +162,7 @@ export const DIALOGUES = [
     id: "daily",
     title: "הַיּוֹם שֶׁלִּי",
     titleEs: "Mi rutina diaria",
-    unlocksAt: 60,
+    unlocksAtGroup: 9,
     lines: [
       {
         speaker: "א",

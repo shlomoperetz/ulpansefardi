@@ -1,7 +1,7 @@
 import { fonts } from "../theme";
 import { MILESTONES, getCurrentMilestone, getNextMilestone } from "../data/milestones";
 import { getProgress } from "../utils/storage";
-import { getMasteredCount, getActiveMana } from "../utils/mana";
+import { getMasteredCount, getActiveMana, getStudyQueue } from "../utils/mana";
 import { WORDS } from "../data/words";
 import { DIALOGUES } from "../data/dialogues";
 
@@ -37,12 +37,31 @@ export default function Home({ t, onNavigate, mastered, mana }) {
   const nextMilestone = getNextMilestone(mastered);
 
   // Dialogue stats
-  const unlockedDialogues = DIALOGUES.filter(d => mastered >= d.unlocksAt).length;
+  const groupsUnlocked = unlocked.length;
+  const unlockedDialogues = DIALOGUES.filter(d => groupsUnlocked >= d.unlocksAtGroup).length;
   const completedDialogues = Object.values(p.dialogues || {}).filter(d => d.phase >= 3 && d.passed).length;
 
   // Group stats
-  const groupsUnlocked = unlocked.length;
   const totalGroups = 12;
+
+  // Next step
+  const studyQueue = getStudyQueue(p, WORDS);
+  const maxUnlocked = Math.max(...unlocked);
+  const canUnlockNext = mana >= 50 && maxUnlocked < totalGroups;
+  const nextGroupNum = maxUnlocked + 1;
+  const hasUntriedDialogue = DIALOGUES.some(
+    d => groupsUnlocked >= d.unlocksAtGroup && !p.dialogues?.[d.id]
+  );
+  let nextStep;
+  if (studyQueue.length > 0) {
+    nextStep = { sala: "peldanos", msg: studyQueue.length + " palabras esperan repaso", icon: "⚡" };
+  } else if (canUnlockNext) {
+    nextStep = { sala: "peldanos", msg: "Maná al " + mana + "% — desbloquea el grupo " + nextGroupNum, icon: "🔓" };
+  } else if (hasUntriedDialogue) {
+    nextStep = { sala: "dialogos", msg: "Hay un diálogo nuevo disponible", icon: "💬" };
+  } else {
+    nextStep = null;
+  }
 
   return (
     <div style={{
@@ -51,6 +70,43 @@ export default function Home({ t, onNavigate, mastered, mana }) {
       padding: "0 16px 80px",
       fontFamily: fonts.ui,
     }}>
+      {/* ── Siguiente paso ──────────────────────────────────────────────────── */}
+      {nextStep ? (
+        <button
+          onClick={() => onNavigate(nextStep.sala)}
+          style={{
+            width: "100%", display: "flex", alignItems: "center", gap: 14,
+            background: t.gold + "18",
+            border: "1px solid " + t.gold + "55",
+            borderRadius: 14, padding: "16px 20px",
+            cursor: "pointer", textAlign: "left", marginBottom: 20,
+          }}
+        >
+          <span style={{ fontSize: 22 }}>{nextStep.icon}</span>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 11, color: t.gold, textTransform: "uppercase", letterSpacing: 1, marginBottom: 2 }}>
+              Siguiente paso
+            </div>
+            <div style={{ fontSize: 14, color: t.text, fontFamily: fonts.ui }}>
+              {nextStep.msg}
+            </div>
+          </div>
+          <span style={{ fontSize: 18, color: t.gold }}>→</span>
+        </button>
+      ) : (
+        <div style={{
+          background: t.surface, border: "1px solid " + t.border,
+          borderRadius: 14, padding: "14px 20px", marginBottom: 20,
+          display: "flex", alignItems: "center", gap: 12,
+        }}>
+          <span style={{ fontSize: 20 }}>✦</span>
+          <div>
+            <div style={{ fontSize: 13, color: t.text, fontWeight: 600 }}>¡Todo al día!</div>
+            <div style={{ fontSize: 12, color: t.muted }}>Vuelve mañana para repasar.</div>
+          </div>
+        </div>
+      )}
+
       {/* ── Desert Map ──────────────────────────────────────────────────────── */}
       <div style={{
         background: t.card,
