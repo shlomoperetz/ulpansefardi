@@ -49,13 +49,13 @@ function useTTS() {
 }
 
 // ── Conjugation table ────────────────────────────────────────────────────────
-function ConjTable({ t, conj }) {
+function ConjTable({ t, conj, conjTr }) {
   if (!conj) return null;
   const cells = [
-    { label: "m.s.", val: conj.ms },
-    { label: "f.s.", val: conj.fs },
-    { label: "m.p.", val: conj.mp },
-    { label: "f.p.", val: conj.fp },
+    { label: "m.s.", val: conj.ms, tr: conjTr?.ms },
+    { label: "f.s.", val: conj.fs, tr: conjTr?.fs },
+    { label: "m.p.", val: conj.mp, tr: conjTr?.mp },
+    { label: "f.p.", val: conj.fp, tr: conjTr?.fp },
   ];
   return (
     <div style={{
@@ -71,6 +71,11 @@ function ConjTable({ t, conj }) {
           <div style={{ fontSize: 18, color: t.text, fontFamily: fonts.serif, direction: "rtl" }}>
             {c.val}
           </div>
+          {c.tr && (
+            <div style={{ fontSize: 11, color: t.gold, marginTop: 2, letterSpacing: 0.3 }}>
+              {c.tr}
+            </div>
+          )}
         </div>
       ))}
     </div>
@@ -438,11 +443,8 @@ export default function Peldanos({ t, onBack, onManaChange }) {
               <div style={{ fontSize: 14, color: t.gold, letterSpacing: 1 }}>
                 {currentWord?.tr}
               </div>
-              {currentWord?.type === "verb" && currentWord?.conj && (
-                <ConjTable t={t} conj={currentWord.conj} />
-              )}
-              {(currentWord?.type === "adjective" || currentWord?.type === "existential") && currentWord?.conj && (
-                <ConjTable t={t} conj={currentWord.conj} />
+              {currentWord?.conj && (
+                <ConjTable t={t} conj={currentWord.conj} conjTr={currentWord.conjTr} />
               )}
             </div>
           </>

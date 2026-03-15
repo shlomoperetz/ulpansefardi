@@ -28,6 +28,7 @@ export const WORDS = [
     binyan: "פָּעַל", root: "ר-צ-ה",
     formula: "אֲנִי רוֹצֶה + ל...",
     conj: { ms: "רוֹצֶה", fs: "רוֹצָה", mp: "רוֹצִים", fp: "רוֹצוֹת" },
+    conjTr: { ms: "rotze", fs: "rotza", mp: "rotzim", fp: "rotzot" },
   },
   { id: "yesh",    he: "יֵשׁ",    tr: "yesh",    es: "hay / tiene",     type: "existential", group: 3 },
   { id: "eyn",     he: "אֵין",    tr: "eyn",     es: "no hay / no tiene", type: "existential", group: 3 },
@@ -37,6 +38,7 @@ export const WORDS = [
     binyan: "פָּעַל", root: "ה-ל-כ",
     formula: "אֲנִי הוֹלֵךְ לְ...",
     conj: { ms: "הוֹלֵךְ", fs: "הוֹלֶכֶת", mp: "הוֹלְכִים", fp: "הוֹלְכוֹת" },
+    conjTr: { ms: "holej", fs: "holechet", mp: "holchim", fp: "holchot" },
   },
   {
     id: "lavo",    he: "לָבוֹא",   tr: "lavo",    es: "venir",
@@ -44,6 +46,7 @@ export const WORDS = [
     binyan: "פָּעַל", root: "ב-א-ה",
     formula: "אֲנִי בָּא מִ...",
     conj: { ms: "בָּא", fs: "בָּאָה", mp: "בָּאִים", fp: "בָּאוֹת" },
+    conjTr: { ms: "ba", fs: "baa", mp: "baim", fp: "baot" },
   },
 
   // ── Group 4 — Place + demonstratives ────────────────────────────────────
@@ -81,6 +84,7 @@ export const WORDS = [
     binyan: "פָּעַל", root: "א-ה-ב",
     formula: "אֲנִי אוֹהֵב אֶת...",
     conj: { ms: "אוֹהֵב", fs: "אוֹהֶבֶת", mp: "אוֹהֲבִים", fp: "אוֹהֲבוֹת" },
+    conjTr: { ms: "ohev", fs: "ohevet", mp: "ohavim", fp: "ohavot" },
   },
   {
     id: "ladaat",  he: "לָדַעַת",  tr: "ladaat",  es: "saber",
@@ -88,6 +92,7 @@ export const WORDS = [
     binyan: "פָּעַל", root: "י-ד-ע",
     formula: "אֲנִי יוֹדֵעַ שֶׁ...",
     conj: { ms: "יוֹדֵעַ", fs: "יוֹדַעַת", mp: "יוֹדְעִים", fp: "יוֹדְעוֹת" },
+    conjTr: { ms: "yodea", fs: "yodaat", mp: "yodim", fp: "yodot" },
   },
   {
     id: "lihiot",  he: "לִהְיוֹת", tr: "lihiot",  es: "ser / estar",
@@ -100,12 +105,14 @@ export const WORDS = [
     binyan: "פָּעַל", root: "י-כ-ל",
     formula: "אֲנִי יָכוֹל + ל...",
     conj: { ms: "יָכוֹל", fs: "יְכוֹלָה", mp: "יְכוֹלִים", fp: "יְכוֹלוֹת" },
+    conjTr: { ms: "yajol", fs: "yejola", mp: "yejolim", fp: "yejolot" },
   },
   {
     id: "tzarich", he: "צָרִיךְ",  tr: "tzarich", es: "necesitar / deber",
     type: "adjective", group: 8,
     formula: "אֲנִי צָרִיךְ + ל...",
     conj: { ms: "צָרִיךְ", fs: "צְרִיכָה", mp: "צְרִיכִים", fp: "צְרִיכוֹת" },
+    conjTr: { ms: "tzarich", fs: "tzricha", mp: "tzrichim", fp: "tzrichot" },
   },
 
   // ── Group 9 — Social expressions ────────────────────────────────────────
@@ -129,6 +136,7 @@ export const WORDS = [
     binyan: "פָּעַל", root: "א-כ-ל",
     formula: "אֲנִי אוֹכֵל",
     conj: { ms: "אוֹכֵל", fs: "אוֹכֶלֶת", mp: "אוֹכְלִים", fp: "אוֹכְלוֹת" },
+    conjTr: { ms: "ojel", fs: "ojelet", mp: "ojlim", fp: "ojlot" },
   },
   {
     id: "lishtot", he: "לִשְׁתּוֹת", tr: "lishtot", es: "beber",
@@ -136,6 +144,7 @@ export const WORDS = [
     binyan: "פָּעַל", root: "שׁ-ת-ה",
     formula: "אֲנִי שׁוֹתֶה",
     conj: { ms: "שׁוֹתֶה", fs: "שׁוֹתָה", mp: "שׁוֹתִים", fp: "שׁוֹתוֹת" },
+    conjTr: { ms: "shote", fs: "shota", mp: "shotim", fp: "shotot" },
   },
   {
     id: "lilmod",  he: "לִלְמוֹד", tr: "lilmod",  es: "estudiar / aprender",
@@ -143,6 +152,7 @@ export const WORDS = [
     binyan: "פָּעַל", root: "ל-מ-ד",
     formula: "אֲנִי לוֹמֵד עִבְרִית",
     conj: { ms: "לוֹמֵד", fs: "לוֹמֶדֶת", mp: "לוֹמְדִים", fp: "לוֹמְדוֹת" },
+    conjTr: { ms: "lomed", fs: "lomedet", mp: "lomdim", fp: "lomdot" },
   },
   {
     id: "laavod",  he: "לַעֲבוֹד", tr: "laavod",  es: "trabajar",
@@ -150,6 +160,7 @@ export const WORDS = [
     binyan: "פָּעַל", root: "ע-ב-ד",
     formula: "אֲנִי עוֹבֵד בְּ...",
     conj: { ms: "עוֹבֵד", fs: "עוֹבֶדֶת", mp: "עוֹבְדִים", fp: "עוֹבְדוֹת" },
+    conjTr: { ms: "oved", fs: "ovedet", mp: "ovdim", fp: "ovdot" },
   },
   {
     id: "ledaber", he: "לְדַבֵּר", tr: "ledaber", es: "hablar",
@@ -157,6 +168,7 @@ export const WORDS = [
     binyan: "פִּיעֵל", root: "ד-ב-ר",
     formula: "אֲנִי מְדַבֵּר עִם...",
     conj: { ms: "מְדַבֵּר", fs: "מְדַבֶּרֶת", mp: "מְדַבְּרִים", fp: "מְדַבְּרוֹת" },
+    conjTr: { ms: "medaber", fs: "medaberet", mp: "medabrim", fp: "medabrot" },
   },
 
   // ── Group 12 — Time extended + adverbs ──────────────────────────────────
