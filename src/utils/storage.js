@@ -1,4 +1,8 @@
-const KEY = "ulpan_progress_v3";
+let KEY = "ulpan_progress_v3";
+
+export function enableDemoMode() {
+  KEY = "ulpan_progress_demo";
+}
 
 function load() {
   try {

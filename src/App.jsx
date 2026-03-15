@@ -1,9 +1,33 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { dark, light, fonts } from "./theme";
 import Landing from "./pages/Landing";
 import Anki from "./components/Anki";
 import Lilmod from "./components/Lilmod";
 import Elemental from "./components/Elemental";
+import { enableDemoMode } from "./utils/storage";
+import { LOTES, ALL_CARDS } from "./data/cards";
+import { BLOQUES_ALEFATO } from "./data/alefato";
+
+// Activar modo demo antes de cualquier lectura de storage
+const isDemo = new URLSearchParams(window.location.search).get("demo") === "1";
+if (isDemo) {
+  enableDemoMode();
+  const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
+  const demo = {
+    cards:        {},
+    loteDone:     {},
+    elementalDone:{},
+    streak:       7,
+    lastSession:  yesterday,
+    currentLote:  1,
+  };
+  ALL_CARDS.forEach(c => {
+    demo.cards[c.he] = { correct: 3, mastered: true, srsReps: 3, srsEf: 2.5, srsInterval: 6, srsNextReview: yesterday };
+  });
+  LOTES.forEach(l => { demo.loteDone[l.id] = true; });
+  BLOQUES_ALEFATO.forEach(b => { demo.elementalDone[b.id] = true; });
+  localStorage.setItem("ulpan_progress_demo", JSON.stringify(demo));
+}
 
 export default function App() {
   const [isDark, setIsDark] = useState(false);
@@ -52,6 +76,13 @@ export default function App() {
           </span>
         </button>
         <div style={{ marginLeft: "auto", display: "flex", gap: 2, alignItems: "center" }}>
+          {isDemo && (
+            <span style={{
+              fontSize: 10, fontFamily: fonts.ui, letterSpacing: 1, textTransform: "uppercase",
+              color: "#f59e0b", border: "1px solid #f59e0b55", borderRadius: 20,
+              padding: "2px 10px", marginRight: 4,
+            }}>demo</span>
+          )}
           {page !== "home" && (
             <button onClick={() => setPage("home")} style={tbarBtn}>←</button>
           )}
