@@ -70,20 +70,25 @@ function generateChoices(correctCard, cardPool) {
   return shuffle([base, ...opts.slice(0, 3)]);
 }
 
-function ConjTable({ conj, t }) {
+function ConjTable({ conj, t, SpeakBtn }) {
   if (!conj) return null;
-  const rows = [
-    [{ label: "הוא / אתה / אני ♂", form: conj.ms }, { label: "היא / את / אני ♀", form: conj.fs }],
-    [{ label: "הם / אתם ♂",        form: conj.mp }, { label: "הן / אתן ♀",       form: conj.fp }],
+  const cells = [
+    { label: "הוא / אתה / אני ♂", form: conj.ms },
+    { label: "היא / את / אני ♀",  form: conj.fs },
+    { label: "הם / אתם ♂",         form: conj.mp },
+    { label: "הן / אתן ♀",          form: conj.fp },
   ];
   return (
     <div style={{ width: "100%", marginTop: 12, borderTop: "1px solid " + t.border, paddingTop: 12 }}>
       <div style={{ fontSize: 10, color: t.subtle, letterSpacing: 1, textTransform: "uppercase", fontFamily: "var(--font-ui, sans-serif)", marginBottom: 8, textAlign: "center" }}>הווה — presente</div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
-        {rows.flat().map(({ label, form }) => (
-          <div key={label} style={{ background: t.surface, borderRadius: 8, padding: "8px 10px", textAlign: "center" }}>
+        {cells.map(({ label, form }) => (
+          <div key={label} style={{ background: t.surface, borderRadius: 12, padding: "8px 10px", textAlign: "center" }}>
             <div style={{ fontSize: 9, color: t.subtle, fontFamily: "var(--font-ui, sans-serif)", marginBottom: 4, direction: "rtl", lineHeight: 1.2 }}>{label}</div>
-            <div style={{ fontSize: 20, fontFamily: "Noto Serif Hebrew, serif", color: t.text, direction: "rtl", lineHeight: 1.4 }}>{form}</div>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>
+              <div style={{ fontSize: 20, fontFamily: "Noto Serif Hebrew, serif", color: t.text, direction: "rtl", lineHeight: 1.4 }}>{form}</div>
+              {SpeakBtn && <SpeakBtn text={form} size={12} />}
+            </div>
           </div>
         ))}
       </div>
@@ -186,6 +191,11 @@ export default function Anki({ t, loteId, onBack }) {
     if (!feedback) inputRef.current?.focus();
   }, [feedback, index, phase]);
 
+  // Auto-play cuando aparece el hebreo en fase 2
+  useEffect(() => {
+    if (phase === 2 && current?.he && ttsOk) speak(current.he);
+  }, [index, phase, ttsOk]);
+
   // Fin phase 1 → phase 2
   useEffect(() => {
     if (phase === 1 && p1Done.size > 0 && p1Active.length === 0) {
@@ -262,6 +272,11 @@ export default function Anki({ t, loteId, onBack }) {
           const wrongs  = sessionWrongs.get(current.he) || 0;
           const quality = wrongs === 0 ? 5 : wrongs === 1 ? 3 : 2;
           saveCardSRS(current.he, quality);
+          // Auto-marcar lote como hecho si todas las cartas ya están dominadas
+          if (!isReview) {
+            const freshP = getProgress();
+            if (lote.cards.every(c => freshP.cards[c.he]?.mastered)) markLoteDone(loteId);
+          }
         }
       }
 
@@ -428,7 +443,7 @@ export default function Anki({ t, loteId, onBack }) {
             return <span style={{ fontSize: 12, padding: "2px 12px", borderRadius: 12, fontFamily: fonts.serif, background: color + "22", color, border: "1px solid " + color + "55" }}>{question.binyan}</span>;
           })()}
 
-          <ConjTable conj={question?.conj} t={t} />
+          <ConjTable conj={question?.conj} t={t} SpeakBtn={SpeakBtn} />
 
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, width: "100%", marginTop: 8 }}>
             {(choices || []).map((opt, i) => {
@@ -494,7 +509,7 @@ export default function Anki({ t, loteId, onBack }) {
           return <span style={{ fontSize: 12, padding: "2px 12px", borderRadius: 12, fontFamily: fonts.serif, background: color + "22", color, border: "1px solid " + color + "55" }}>{current.binyan}</span>;
         })()}
 
-        {phase === 2 && <ConjTable conj={current?.conj} t={t} />}
+        {phase === 2 && <ConjTable conj={current?.conj} t={t} SpeakBtn={SpeakBtn} />}
 
         {phase === 2 && current && (
           <button style={{ background: "none", border: "1px solid " + t.border, color: t.muted, fontSize: 12, padding: "4px 14px", borderRadius: 20, cursor: "pointer", fontFamily: fonts.ui }} onClick={() => setShowTr(v => !v)}>
@@ -553,7 +568,7 @@ export default function Anki({ t, loteId, onBack }) {
                   </div>
                   {phase === 2 && <span style={{ fontSize: 13, color: t.muted, fontStyle: "italic", fontFamily: fonts.ui }}>{current.tr}</span>}
                 </div>
-                {phase === 3 && <ConjTable conj={current?.conj} t={t} />}
+                {phase === 3 && <ConjTable conj={current?.conj} t={t} SpeakBtn={SpeakBtn} />}
               </div>
             )}
             {feedback === "wrong" && (

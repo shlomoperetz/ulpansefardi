@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { LOTES, BINYAN_COLORS } from "../data/cards";
 import { FRASES_POR_LOTE } from "../data/frases";
 import { fonts } from "../theme";
@@ -11,11 +11,52 @@ export default function Lilmod({ t, loteId, onBack }) {
   const card = lote.cards[index];
   const isLast = index === lote.cards.length - 1;
 
+  // ── TTS ──────────────────────────────────────────────────────────────────
+  const synthRef = useRef(null);
+  const voiceRef = useRef(null);
+  const [ttsOk, setTtsOk] = useState(false);
+
+  useEffect(() => {
+    const synth = window.speechSynthesis;
+    if (!synth) return;
+    synthRef.current = synth;
+    function loadVoices() {
+      const v = synth.getVoices().find(v => v.lang.startsWith("he"));
+      if (v) { voiceRef.current = v; setTtsOk(true); }
+    }
+    loadVoices();
+    synth.addEventListener("voiceschanged", loadVoices);
+    return () => synth.removeEventListener("voiceschanged", loadVoices);
+  }, []);
+
+  const speak = useCallback((text) => {
+    if (!synthRef.current || !voiceRef.current) return;
+    synthRef.current.cancel();
+    const utt = new SpeechSynthesisUtterance(text);
+    utt.voice = voiceRef.current;
+    utt.lang  = "he-IL";
+    utt.rate  = 0.85;
+    synthRef.current.speak(utt);
+  }, []);
+
+  // Auto-play al cambiar de carta
+  useEffect(() => {
+    if (ttsOk && card?.he) speak(card.he);
+  }, [index, ttsOk]);
+
+  const SpeakBtn = ({ text, size = 15 }) => !ttsOk ? null : (
+    <button
+      onClick={(e) => { e.stopPropagation(); speak(text); }}
+      title="Escuchar"
+      style={{ background: "none", border: "none", cursor: "pointer", color: t.gold, fontSize: size, padding: "2px 4px", lineHeight: 1, flexShrink: 0 }}
+    >🔊</button>
+  );
+
   function goNext() { setIndex(i => i + 1); setRevealed(false); }
   function goPrev() { setIndex(i => i - 1); setRevealed(false); }
 
   const btnBase = {
-    flex: 1, background: t.card, border: "1px solid " + t.border, borderRadius: 10,
+    flex: 1, background: t.card, border: "1px solid " + t.border, borderRadius: 14,
     padding: "12px 0", color: t.muted, fontSize: 14, fontFamily: fonts.ui,
     cursor: "pointer",
   };
@@ -35,15 +76,18 @@ export default function Lilmod({ t, loteId, onBack }) {
       <div
         onClick={() => !revealed && setRevealed(true)}
         style={{
-          background: t.card, border: "1px solid " + t.border, borderRadius: 16,
+          background: t.card, border: "1px solid " + t.border, borderRadius: 22,
           padding: "48px 32px", textAlign: "center",
           cursor: revealed ? "default" : "pointer",
           minHeight: 240, display: "flex", flexDirection: "column",
           alignItems: "center", justifyContent: "center", gap: 12,
-          boxShadow: "0 8px 40px #00000014", transition: "border-color 0.3s",
+          boxShadow: "0 8px 40px rgba(0,80,200,0.10)", transition: "border-color 0.3s",
         }}
       >
-        <div style={{ fontSize: 48, fontWeight: "bold", direction: "rtl", lineHeight: 1.3 }}>{card.he}</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ fontSize: 48, fontWeight: "bold", direction: "rtl", lineHeight: 1.3 }}>{card.he}</div>
+          <SpeakBtn text={card.he} size={22} />
+        </div>
         <div style={{ fontSize: 14, color: t.muted, fontStyle: "italic", fontFamily: fonts.ui }}>{card.tr}</div>
 
         {card.binyan && (() => {
@@ -57,6 +101,28 @@ export default function Lilmod({ t, loteId, onBack }) {
             </span>
           );
         })()}
+
+        {card.conj && revealed && (
+          <div style={{ width: "100%", marginTop: 8, borderTop: "1px solid " + t.border, paddingTop: 12 }}>
+            <div style={{ fontSize: 10, color: t.subtle, letterSpacing: 1, textTransform: "uppercase", fontFamily: fonts.ui, marginBottom: 8, textAlign: "center" }}>הווה — presente</div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+              {[
+                { label: "הוא / אתה / אני ♂", form: card.conj.ms },
+                { label: "היא / את / אני ♀",  form: card.conj.fs },
+                { label: "הם / אתם ♂",         form: card.conj.mp },
+                { label: "הן / אתן ♀",          form: card.conj.fp },
+              ].map(({ label, form }) => (
+                <div key={label} style={{ background: t.surface, borderRadius: 12, padding: "8px 10px", textAlign: "center" }}>
+                  <div style={{ fontSize: 9, color: t.subtle, fontFamily: fonts.ui, marginBottom: 4, direction: "rtl", lineHeight: 1.2 }}>{label}</div>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 4 }}>
+                    <div style={{ fontSize: 20, fontFamily: fonts.serif, color: t.text, direction: "rtl", lineHeight: 1.4 }}>{form}</div>
+                    <SpeakBtn text={form} size={12} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {revealed ? (
           <div style={{ fontSize: 26, color: t.text, marginTop: 12, fontFamily: fonts.ui }}>{card.es}</div>
@@ -89,8 +155,11 @@ export default function Lilmod({ t, loteId, onBack }) {
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {FRASES_POR_LOTE[loteId].map((f, i) => (
-              <div key={i} style={{ background: t.card, borderRadius: 12, padding: "14px 20px", borderLeft: "3px solid " + t.gold + "55" }}>
-                <div style={{ fontSize: 20, fontWeight: "bold", direction: "rtl", color: t.text, lineHeight: 1.4 }}>{f.he}</div>
+              <div key={i} style={{ background: t.card, borderRadius: 16, padding: "14px 20px", borderLeft: "3px solid " + t.gold + "88" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, justifyContent: "flex-end" }}>
+                  <div style={{ fontSize: 20, fontWeight: "bold", direction: "rtl", color: t.text, lineHeight: 1.4, flex: 1, textAlign: "right" }}>{f.he}</div>
+                  <SpeakBtn text={f.he} size={14} />
+                </div>
                 <div style={{ fontSize: 11, color: t.muted, fontStyle: "italic", fontFamily: fonts.ui, marginTop: 3 }}>{f.tr}</div>
                 <div style={{ fontSize: 13, color: t.muted, fontFamily: fonts.ui, marginTop: 5 }}>{f.es}</div>
               </div>
