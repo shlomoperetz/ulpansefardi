@@ -8,10 +8,10 @@ import { SENTENCES } from "../data/sentences";
 
 const SALAS = [
   {
-    id: "peldanos",
+    id: "pasos",
     icon: "⚡",
-    label: "Peldaños",
-    labelHe: "מַדְרֵגוֹת",
+    label: "Pasos",
+    labelHe: "צְעָדִים",
     desc: "Aprende y repasa palabras con el sistema de maná.",
   },
   {
@@ -62,9 +62,9 @@ export default function Home({ t, onNavigate, mastered, mana }) {
   );
   let nextStep;
   if (studyQueue.length > 0) {
-    nextStep = { sala: "peldanos", msg: studyQueue.length + " palabras esperan repaso", icon: "⚡" };
+    nextStep = { sala: "pasos", msg: studyQueue.length + " palabras esperan repaso", icon: "⚡" };
   } else if (canUnlockNext) {
-    nextStep = { sala: "peldanos", msg: "Empieza el grupo " + nextGroupNum + " — 5 palabras nuevas", icon: "🔓" };
+    nextStep = { sala: "pasos", msg: "Empieza el grupo " + nextGroupNum + " — 5 palabras nuevas", icon: "🔓" };
   } else if (hasUntriedDialogue) {
     nextStep = { sala: "dialogos", msg: "Hay un diálogo nuevo disponible", icon: "💬" };
   } else {
@@ -257,7 +257,7 @@ export default function Home({ t, onNavigate, mastered, mana }) {
       }}>
         {SALAS.map(sala => {
           let stat = null;
-          if (sala.id === "peldanos") {
+          if (sala.id === "pasos") {
             stat = mastered + " / " + totalUnlockedWords + " dominadas";
           } else if (sala.id === "dialogos") {
             stat = completedDialogues + " / " + DIALOGUES.length + " completados";

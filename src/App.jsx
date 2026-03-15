@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { dark, light, fonts } from "./theme";
 import Home from "./pages/Home";
-import Peldanos from "./components/Peldanos";
+import Pasos from "./components/Pasos";
 import Patrones from "./components/Patrones";
 import Dialogos from "./components/Dialogos";
 import Elemental from "./components/Elemental";
@@ -23,6 +23,7 @@ if (isDemo) {
     elementalDone: {},
     streak: 7,
     lastSession: yesterday,
+    sentencesCorrect: 20,
   };
   WORDS.forEach(w => {
     demo.words[w.id] = {
@@ -148,7 +149,7 @@ export default function App() {
 
       <div style={{ paddingTop: 16 }}>
         {page === "home"      && <Home t={t} onNavigate={setPage} mastered={mastered} mana={mana} />}
-        {page === "peldanos"  && <Peldanos t={t} onBack={goHome} onManaChange={refreshMana} />}
+        {page === "pasos"     && <Pasos t={t} onBack={goHome} onManaChange={refreshMana} onNavigate={setPage} />}
         {page === "patrones"  && <Patrones t={t} onBack={goHome} />}
         {page === "dialogos"  && <Dialogos t={t} onBack={goHome} />}
         {page === "elemental"   && <Elemental t={t} onBack={goHome} />}

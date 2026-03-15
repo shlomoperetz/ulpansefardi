@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { fonts } from "../theme";
 import { SENTENCES } from "../data/sentences";
-import { getProgress } from "../utils/storage";
+import { getProgress, saveSentenceCorrect } from "../utils/storage";
 import { stripNikud } from "../utils/mana";
 
 // ── Hebrew keyboard ───────────────────────────────────────────────────────────
@@ -105,6 +105,7 @@ export default function Mishnatot({ t, onBack }) {
     const ok = isCorrect(input, answer);
     setResult(ok ? "correct" : "wrong");
     setStats(s => ({ ...s, [ok ? "correct" : "wrong"]: s[ok ? "correct" : "wrong"] + 1 }));
+    if (ok) saveSentenceCorrect();
   }
 
   function handleNext() {

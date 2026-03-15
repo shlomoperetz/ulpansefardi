@@ -6,6 +6,7 @@ import {
   saveWordProgress,
   unlockGroup,
   markTodayDone,
+  canUnlockNextGroup,
 } from "../utils/storage";
 import {
   getStudyQueue,
@@ -226,6 +227,7 @@ export default function Peldanos({ t, onBack, onManaChange }) {
   if (done) {
     const total = sessionStats.know + sessionStats.partial + sessionStats.dont;
     const activeMana = getActiveMana(progress, WORDS);
+    const unlockAllowed = canUnlockNextGroup(progress);
 
     return (
       <div style={{
@@ -280,7 +282,7 @@ export default function Peldanos({ t, onBack, onManaChange }) {
           </div>
         </div>
 
-        {nextGroup && (
+        {nextGroup && unlockAllowed && (
           <button
             onClick={handleUnlock}
             style={{
@@ -291,6 +293,43 @@ export default function Peldanos({ t, onBack, onManaChange }) {
           >
             🔓 Continuar — Grupo {nextGroup} →
           </button>
+        )}
+
+        {nextGroup && !unlockAllowed && (
+          <div style={{
+            background: t.surface, border: "1px solid " + t.border,
+            borderRadius: 12, padding: "16px", marginBottom: 10,
+          }}>
+            <div style={{ fontSize: 13, color: t.text, fontWeight: 600, marginBottom: 6 }}>
+              🔒 Para continuar al Grupo {nextGroup}:
+            </div>
+            <div style={{ fontSize: 12, color: t.muted, lineHeight: 1.7 }}>
+              Completa <strong style={{ color: t.gold }}>5 frases correctas</strong> en Frases<br />
+              o aprueba <strong style={{ color: t.gold }}>un diálogo</strong> completo
+            </div>
+            <div style={{ display: "flex", gap: 8, marginTop: 12 }}>
+              <button
+                onClick={() => { onNavigate?.("mishnatot"); }}
+                style={{
+                  flex: 1, background: t.gold + "22", border: "1px solid " + t.gold + "55",
+                  borderRadius: 8, padding: "10px", color: t.gold,
+                  fontSize: 13, cursor: "pointer",
+                }}
+              >
+                ✍️ Ir a Frases →
+              </button>
+              <button
+                onClick={() => { onNavigate?.("dialogos"); }}
+                style={{
+                  flex: 1, background: t.surface, border: "1px solid " + t.border,
+                  borderRadius: 8, padding: "10px", color: t.muted,
+                  fontSize: 13, cursor: "pointer",
+                }}
+              >
+                💬 Ir a Diálogos →
+              </button>
+            </div>
+          </div>
         )}
 
         <button

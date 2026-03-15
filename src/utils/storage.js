@@ -18,6 +18,7 @@ const DEFAULTS = {
   unlockedGroups: [1],    // which groups are unlocked (start with group 1)
   dialogues: {},          // dialogueId → { phase: 1|2|3, passed: bool, lastSeen: date }
   elementalDone: {},      // bloqueId → bool (kept for Elemental.jsx compatibility)
+  sentencesCorrect: 0,    // total correct answers in Frases
   streak: 0,
   lastSession: null,
 };
@@ -74,6 +75,18 @@ export function markElementalDone(bloqueId) {
 export function isElementalUnlocked(bloque, elementalDone) {
   if (!bloque.requires) return true;
   return bloque.requires.every(id => elementalDone[id]);
+}
+
+export function saveSentenceCorrect() {
+  const p = getProgress();
+  p.sentencesCorrect = (p.sentencesCorrect || 0) + 1;
+  save(p);
+}
+
+export function canUnlockNextGroup(p) {
+  const sentencesOk = (p.sentencesCorrect || 0) >= 5;
+  const dialogueOk = Object.values(p.dialogues || {}).some(d => d.passed);
+  return sentencesOk || dialogueOk;
 }
 
 export function resetProgress() {
