@@ -47,7 +47,7 @@ export default function Home({ t, onNavigate, mastered, mana }) {
   // Next step
   const studyQueue = getStudyQueue(p, WORDS);
   const maxUnlocked = Math.max(...unlocked);
-  const canUnlockNext = mana >= 50 && maxUnlocked < totalGroups;
+  const canUnlockNext = maxUnlocked < totalGroups;
   const nextGroupNum = maxUnlocked + 1;
   const hasUntriedDialogue = DIALOGUES.some(
     d => groupsUnlocked >= d.unlocksAtGroup && !p.dialogues?.[d.id]
@@ -56,7 +56,7 @@ export default function Home({ t, onNavigate, mastered, mana }) {
   if (studyQueue.length > 0) {
     nextStep = { sala: "peldanos", msg: studyQueue.length + " palabras esperan repaso", icon: "⚡" };
   } else if (canUnlockNext) {
-    nextStep = { sala: "peldanos", msg: "Maná al " + mana + "% — desbloquea el grupo " + nextGroupNum, icon: "🔓" };
+    nextStep = { sala: "peldanos", msg: "Empieza el grupo " + nextGroupNum + " — 5 palabras nuevas", icon: "🔓" };
   } else if (hasUntriedDialogue) {
     nextStep = { sala: "dialogos", msg: "Hay un diálogo nuevo disponible", icon: "💬" };
   } else {

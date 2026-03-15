@@ -101,7 +101,6 @@ export default function Peldanos({ t, onBack, onManaChange }) {
   const [sessionStats, setSessionStats] = useState({ know: 0, partial: 0, dont: 0 });
   const [done, setDone] = useState(false);
   const [progress, setProgress] = useState(() => getProgress());
-  const [canUnlock, setCanUnlock] = useState(false);
   const [nextGroup, setNextGroup] = useState(null);
   const [unlockBanner, setUnlockBanner] = useState(null);
 
@@ -110,9 +109,11 @@ export default function Peldanos({ t, onBack, onManaChange }) {
     const p = getProgress();
     setProgress(p);
     const q = getStudyQueue(p, WORDS);
-    // shuffle
     const shuffled = [...q].sort(() => Math.random() - 0.5);
     setQueue(shuffled);
+    // Pre-compute next group
+    const maxUnlocked = Math.max(...(p.unlockedGroups || [1]));
+    if (maxUnlocked < 12) setNextGroup(maxUnlocked + 1);
   }, []);
 
   // Auto-play TTS on new card (front)
@@ -125,18 +126,6 @@ export default function Peldanos({ t, onBack, onManaChange }) {
       }
     }
   }, [currentIndex, flipped, queue]);
-
-  // Check unlock conditions when done
-  useEffect(() => {
-    if (!done) return;
-    const p = getProgress();
-    const activeMana = getActiveMana(p, WORDS);
-    const unlockedGroups = p.unlockedGroups || [1];
-    const maxUnlocked = Math.max(...unlockedGroups);
-    const next = maxUnlocked < 12 ? maxUnlocked + 1 : null;
-    setCanUnlock(activeMana >= 50 && next !== null);
-    setNextGroup(next);
-  }, [done]);
 
   const currentWord = queue[currentIndex];
 
@@ -164,15 +153,19 @@ export default function Peldanos({ t, onBack, onManaChange }) {
     if (!nextGroup) return;
     unlockGroup(nextGroup);
     onManaChange?.();
-    // Start a new session with the newly unlocked words
-    const newWords = getWordsForGroup(nextGroup).sort(() => Math.random() - 0.5);
+    const unlockedNum = nextGroup;
+    // Pre-compute the group after this one
+    const p = getProgress();
+    const maxUnlocked = Math.max(...(p.unlockedGroups || [1]), nextGroup);
+    setNextGroup(maxUnlocked < 12 ? maxUnlocked + 1 : null);
+    // Start new session with unlocked words
+    const newWords = getWordsForGroup(unlockedNum).sort(() => Math.random() - 0.5);
     setQueue(newWords);
     setCurrentIndex(0);
     setFlipped(false);
     setDone(false);
     setSessionStats({ know: 0, partial: 0, dont: 0 });
-    setUnlockBanner(nextGroup);
-    setCanUnlock(false);
+    setUnlockBanner(unlockedNum);
     setTimeout(() => setUnlockBanner(null), 3000);
   }
 
@@ -194,18 +187,30 @@ export default function Peldanos({ t, onBack, onManaChange }) {
           <h2 style={{ fontSize: 22, color: t.text, fontFamily: fonts.serif, margin: "0 0 12px" }}>
             Todo al día
           </h2>
-          <p style={{ color: t.muted, lineHeight: 1.6 }}>
-            No hay palabras pendientes para hoy. Vuelve mañana o desbloquea un nuevo grupo.
+          <p style={{ color: t.muted, lineHeight: 1.6, marginBottom: 24 }}>
+            No hay palabras pendientes para hoy.
           </p>
+          {nextGroup && (
+            <button
+              onClick={handleUnlock}
+              style={{
+                width: "100%", background: t.gold, border: "none",
+                borderRadius: 10, padding: "14px", color: t.bg,
+                fontSize: 14, fontWeight: "bold", cursor: "pointer", marginBottom: 10,
+              }}
+            >
+              🔓 Empezar Grupo {nextGroup} — 5 palabras nuevas →
+            </button>
+          )}
           <button
             onClick={onBack}
             style={{
-              marginTop: 24, background: t.gold, border: "none",
-              borderRadius: 10, padding: "12px 32px", color: t.bg,
-              fontSize: 14, cursor: "pointer",
+              width: "100%", background: "none",
+              border: "1px solid " + t.border, borderRadius: 10,
+              padding: "12px", color: t.muted, fontSize: 14, cursor: "pointer",
             }}
           >
-            ← Volver
+            ← Volver al inicio
           </button>
         </div>
       </div>
@@ -270,17 +275,16 @@ export default function Peldanos({ t, onBack, onManaChange }) {
           </div>
         </div>
 
-        {/* Unlock button */}
-        {canUnlock && (
+        {nextGroup && (
           <button
             onClick={handleUnlock}
             style={{
               width: "100%", background: t.gold, border: "none",
               borderRadius: 10, padding: "14px", color: t.bg,
-              fontSize: 14, fontWeight: "bold", cursor: "pointer", marginBottom: 12,
+              fontSize: 14, fontWeight: "bold", cursor: "pointer", marginBottom: 10,
             }}
           >
-            🔓 Desbloquear Grupo {nextGroup} →
+            🔓 Continuar — Grupo {nextGroup} →
           </button>
         )}
 
