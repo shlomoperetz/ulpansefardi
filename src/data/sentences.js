@@ -4,8 +4,8 @@
 export const SENTENCES = [
   // ── Grupo 2+ ─────────────────────────────────────────────────────────────
   { id: "s01", he: "מִי אַתָּה?",            tr: "Mi ata?",                   es: "¿Quién eres tú?",           unlocksAtGroup: 2,  gender: "ms" },
-  { id: "s02", he: "מָה זֶה?",               tr: "Ma ze?",                    es: "¿Qué es esto?",             unlocksAtGroup: 2,  gender: null },
-  { id: "s03", he: "כֵּן, אֲנִי פֹּה.",      tr: "Ken, ani po.",               es: "Sí, estoy aquí.",           unlocksAtGroup: 2,  gender: null },
+  { id: "s02", he: "מָה זֶה?",               tr: "Ma ze?",                    es: "¿Qué es esto?",             unlocksAtGroup: 4,  gender: null },
+  { id: "s03", he: "כֵּן, אֲנִי פֹּה.",      tr: "Ken, ani po.",               es: "Sí, estoy aquí.",           unlocksAtGroup: 4,  gender: null },
 
   // ── Grupo 3+ ─────────────────────────────────────────────────────────────
   { id: "s04", he: "אֲנִי רוֹצֶה לָלֶכֶת.", tr: "Ani rotze lalechet.",        es: "Quiero ir.",                unlocksAtGroup: 3,  gender: "ms" },
@@ -47,7 +47,7 @@ export const SENTENCES = [
   { id: "s30", he: "אַתָּה צָרִיךְ לָבוֹא.",  tr: "Ata tzarich lavo.",          es: "Necesitas venir.",          unlocksAtGroup: 8,  gender: "ms" },
 
   // ── Grupo 9+ ─────────────────────────────────────────────────────────────
-  { id: "s31", he: "שָׁלוֹם! מִי אַתָּה?",   tr: "Shalom! Mi ata?",           es: "¡Hola! ¿Quién eres?",       unlocksAtGroup: 9,  gender: "ms" },
+  { id: "s31", he: "שָׁלוֹם! מִי אַתָּה?",   tr: "Shalom! Mi ata?",           es: "¡Hola! ¿Quién eres?",       unlocksAtGroup: 3,  gender: "ms" },
   { id: "s32", he: "תּוֹדָה, בְּסֵדֶר.",     tr: "Toda, beseder.",             es: "Gracias, de acuerdo.",      unlocksAtGroup: 9,  gender: null },
   { id: "s33", he: "סְלִיחָה, אֵיפֹה הוּא?", tr: "Sliha, eyfo hu?",           es: "Perdón, ¿dónde está él?",   unlocksAtGroup: 9,  gender: null },
   { id: "s34", he: "בְּבַקָּשָׁה, אֲנִי רוֹצֶה לָלֶכֶת.", tr: "Bevakasha, ani rotze lalechet.", es: "Por favor, quiero ir.", unlocksAtGroup: 9, gender: "ms" },

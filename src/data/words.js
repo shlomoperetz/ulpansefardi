@@ -15,11 +15,12 @@ export const WORDS = [
   { id: "hi",      he: "הִיא",     tr: "hi",      es: "ella",        type: "pronoun",  group: 1 },
 
   // ── Group 2 — More pronouns + basics ────────────────────────────────────
-  { id: "anajnu",  he: "אֲנַחְנוּ", tr: "anajnu",  es: "nosotros",    type: "pronoun",  group: 2 },
-  { id: "ken",     he: "כֵּן",     tr: "ken",     es: "sí",          type: "adverb",   group: 2 },
-  { id: "lo",      he: "לֹא",     tr: "lo",      es: "no",          type: "adverb",   group: 2 },
-  { id: "ma",      he: "מָה",     tr: "ma",      es: "¿qué?",       type: "question", group: 2 },
-  { id: "mi",      he: "מִי",     tr: "mi",      es: "¿quién?",     type: "question", group: 2 },
+  { id: "anajnu",  he: "אֲנַחְנוּ", tr: "anajnu",  es: "nosotros",       type: "pronoun",    group: 2 },
+  { id: "ken",     he: "כֵּן",     tr: "ken",     es: "sí",             type: "adverb",     group: 2 },
+  { id: "lo",      he: "לֹא",     tr: "lo",      es: "no",             type: "adverb",     group: 2 },
+  { id: "ma",      he: "מָה",     tr: "ma",      es: "¿qué?",          type: "question",   group: 2 },
+  { id: "mi",      he: "מִי",     tr: "mi",      es: "¿quién?",        type: "question",   group: 2 },
+  { id: "shalom",  he: "שָׁלוֹם",  tr: "shalom",  es: "hola / adiós / paz", type: "expression", group: 2 },
 
   // ── Group 3 — First verbs ────────────────────────────────────────────────
   {
@@ -50,11 +51,12 @@ export const WORDS = [
   },
 
   // ── Group 4 — Place + demonstratives ────────────────────────────────────
-  { id: "po",      he: "פֹּה",    tr: "po",      es: "aquí",        type: "adverb",   group: 4 },
-  { id: "sham",    he: "שָׁם",    tr: "sham",    es: "allí",        type: "adverb",   group: 4 },
-  { id: "ze",      he: "זֶה",     tr: "ze",      es: "esto (m)",    type: "pronoun",  group: 4 },
-  { id: "zot",     he: "זֹאת",    tr: "zot",     es: "esto (f)",    type: "pronoun",  group: 4 },
-  { id: "eyfo",    he: "אֵיפֹה",  tr: "eyfo",    es: "¿dónde?",    type: "question", group: 4 },
+  { id: "po",      he: "פֹּה",    tr: "po",      es: "aquí",              type: "adverb",     group: 4 },
+  { id: "sham",    he: "שָׁם",    tr: "sham",    es: "allí",              type: "adverb",     group: 4 },
+  { id: "ze",      he: "זֶה",     tr: "ze",      es: "esto (m)",          type: "pronoun",    group: 4 },
+  { id: "zot",     he: "זֹאת",    tr: "zot",     es: "esto (f)",          type: "pronoun",    group: 4 },
+  { id: "eyfo",    he: "אֵיפֹה",  tr: "eyfo",    es: "¿dónde?",          type: "question",   group: 4 },
+  { id: "beseder", he: "בְּסֵדֶר", tr: "beseder", es: "de acuerdo / bien", type: "expression", group: 4 },
 
   // ── Group 5 — Time basics ────────────────────────────────────────────────
   { id: "axshav",  he: "עַכְשָׁו", tr: "axshav",  es: "ahora",       type: "adverb",   group: 5 },
@@ -62,20 +64,26 @@ export const WORDS = [
   { id: "maxar",   he: "מָחָר",    tr: "maxar",   es: "mañana",      type: "adverb",   group: 5 },
   { id: "yom",     he: "יוֹם",    tr: "yom",     es: "día",         type: "noun",     group: 5 },
   { id: "matai",   he: "מָתַי",   tr: "matai",   es: "¿cuándo?",   type: "question", group: 5 },
+  { id: "boker",   he: "בֹּקֶר",   tr: "boker",   es: "mañana (hora)", type: "noun",  group: 5 },
+  { id: "erev",    he: "עֶרֶב",   tr: "erev",    es: "tarde / noche", type: "noun",   group: 5 },
+  { id: "zman",    he: "זְמַן",    tr: "zman",    es: "tiempo",      type: "noun",     group: 5 },
+  { id: "o",       he: "אוֹ",      tr: "o",       es: "o / u",       type: "connector", group: 5 },
 
   // ── Group 6 — Quantity ───────────────────────────────────────────────────
-  { id: "harbe",   he: "הַרְבֵּה", tr: "harbe",   es: "mucho",       type: "adverb",   group: 6 },
-  { id: "meat",    he: "מְעַט",   tr: "meat",    es: "poco",        type: "adverb",   group: 6 },
-  { id: "yoter",   he: "יוֹתֵר",  tr: "yoter",   es: "más",         type: "adverb",   group: 6 },
-  { id: "kama",    he: "כַּמָּה",  tr: "kama",    es: "¿cuánto?",   type: "question", group: 6 },
+  { id: "harbe",   he: "הַרְבֵּה", tr: "harbe",   es: "mucho",            type: "adverb",    group: 6 },
+  { id: "meat",    he: "מְעַט",   tr: "meat",    es: "poco",             type: "adverb",    group: 6 },
+  { id: "yoter",   he: "יוֹתֵר",  tr: "yoter",   es: "más",              type: "adverb",    group: 6 },
+  { id: "kama",    he: "כַּמָּה",  tr: "kama",    es: "¿cuánto?",        type: "question",  group: 6 },
   { id: "rak",     he: "רַק",     tr: "rak",     es: "solo / solamente", type: "connector", group: 6 },
+  { id: "shuk",    he: "שׁוּק",    tr: "shuk",    es: "mercado",          type: "noun",      group: 6 },
 
   // ── Group 7 — Key connectors ─────────────────────────────────────────────
-  { id: "ve",      he: "וְ",      tr: "ve",      es: "y",           type: "connector",   group: 7 },
-  { id: "aval",    he: "אֲבָל",   tr: "aval",    es: "pero",        type: "connector",   group: 7 },
+  { id: "ve",      he: "וְ",      tr: "ve",      es: "y",            type: "connector",   group: 7 },
+  { id: "aval",    he: "אֲבָל",   tr: "aval",    es: "pero",         type: "connector",   group: 7 },
   { id: "ki",      he: "כִּי",    tr: "ki",      es: "porque / que", type: "connector",   group: 7 },
-  { id: "gam",     he: "גַּם",    tr: "gam",     es: "también",     type: "connector",   group: 7 },
-  { id: "im",      he: "עִם",     tr: "im",      es: "con",         type: "preposition", group: 7 },
+  { id: "gam",     he: "גַּם",    tr: "gam",     es: "también",      type: "connector",   group: 7 },
+  { id: "im",      he: "עִם",     tr: "im",      es: "con",          type: "preposition", group: 7 },
+  { id: "kol",     he: "כָּל",    tr: "kol",     es: "todo / todos", type: "connector",   group: 7 },
 
   // ── Group 8 — Core verbs 2 ───────────────────────────────────────────────
   {
@@ -116,11 +124,10 @@ export const WORDS = [
   },
 
   // ── Group 9 — Social expressions ────────────────────────────────────────
-  { id: "shalom",    he: "שָׁלוֹם",      tr: "shalom",    es: "hola / adiós / paz",    type: "expression", group: 9 },
-  { id: "toda",      he: "תּוֹדָה",      tr: "toda",      es: "gracias",               type: "expression", group: 9 },
-  { id: "bevakasha", he: "בְּבַקָּשָׁה", tr: "bevakasha", es: "por favor / de nada",   type: "expression", group: 9 },
-  { id: "sliha",     he: "סְלִיחָה",     tr: "sliha",     es: "perdón / disculpe",     type: "expression", group: 9 },
-  { id: "beseder",   he: "בְּסֵדֶר",     tr: "beseder",   es: "de acuerdo / bien",     type: "expression", group: 9 },
+  { id: "toda",      he: "תּוֹדָה",      tr: "toda",      es: "gracias",             type: "expression", group: 9 },
+  { id: "bevakasha", he: "בְּבַקָּשָׁה", tr: "bevakasha", es: "por favor / de nada", type: "expression", group: 9 },
+  { id: "sliha",     he: "סְלִיחָה",     tr: "sliha",     es: "perdón / disculpe",   type: "expression", group: 9 },
+  { id: "kafe",      he: "קָפֶה",        tr: "kafe",      es: "café",                type: "noun",       group: 9 },
 
   // ── Group 10 — Key nouns ─────────────────────────────────────────────────
   { id: "bayt",      he: "בַּיִת",   tr: "bayt",    es: "casa",              type: "noun", group: 10 },
@@ -170,11 +177,11 @@ export const WORDS = [
     conj: { ms: "מְדַבֵּר", fs: "מְדַבֶּרֶת", mp: "מְדַבְּרִים", fp: "מְדַבְּרוֹת" },
     conjTr: { ms: "medaber", fs: "medaberet", mp: "medabrim", fp: "medabrot" },
   },
+  { id: "avoda",   he: "עֲבוֹדָה", tr: "avoda",   es: "trabajo (noun)",  type: "noun",   group: 11 },
 
   // ── Group 12 — Time extended + adverbs ──────────────────────────────────
   { id: "shana",   he: "שָׁנָה",   tr: "shana",   es: "año",   type: "noun",   group: 12 },
   { id: "xodesh",  he: "חֹדֶשׁ",   tr: "xodesh",  es: "mes",   type: "noun",   group: 12 },
-  { id: "zman",    he: "זְמַן",    tr: "zman",    es: "tiempo", type: "noun",   group: 12 },
   { id: "etmol",   he: "אֶתְמוֹל", tr: "etmol",   es: "ayer",  type: "adverb", group: 12 },
   { id: "kvar",    he: "כְּבָר",   tr: "kvar",    es: "ya",    type: "adverb", group: 12 },
 ];
