@@ -134,7 +134,7 @@ export default function Peldanos({ t, onBack, onManaChange }) {
     const unlockedGroups = p.unlockedGroups || [1];
     const maxUnlocked = Math.max(...unlockedGroups);
     const next = maxUnlocked < 12 ? maxUnlocked + 1 : null;
-    setCanUnlock(activeMana >= 65 && next !== null);
+    setCanUnlock(activeMana >= 50 && next !== null);
     setNextGroup(next);
   }, [done]);
 

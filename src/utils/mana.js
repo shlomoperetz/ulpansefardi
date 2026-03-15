@@ -41,8 +41,7 @@ export function applyAssessment(wordData, assessment) {
   let newData = { ...wordData, lastReviewed: now };
 
   if (assessment === "know") {
-    if (currentMana < 25)      newMana = 25;
-    else if (currentMana < 50) newMana = 50;
+    if (currentMana < 50)      newMana = 50;
     else if (currentMana < 70) newMana = 70;
     else {
       // SRS review correct

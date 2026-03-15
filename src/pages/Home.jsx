@@ -27,13 +27,6 @@ const SALAS = [
     labelHe: "דְּפוּסִים",
     desc: "Explora todo el vocabulario organizado por tipo.",
   },
-  {
-    id: "elemental",
-    icon: "🔤",
-    label: "Elemental",
-    labelHe: "אֶלֶמֶנְטָרִי",
-    desc: "Aprende el alefato y las vocales desde cero.",
-  },
 ];
 
 export default function Home({ t, onNavigate, mastered, mana }) {
@@ -206,9 +199,6 @@ export default function Home({ t, onNavigate, mastered, mana }) {
             stat = completedDialogues + " / " + DIALOGUES.length + " completados";
           } else if (sala.id === "patrones") {
             stat = WORDS.filter(w => unlocked.includes(w.group)).length + " palabras desbloqueadas";
-          } else if (sala.id === "elemental") {
-            const eDone = Object.values(p.elementalDone || {}).filter(Boolean).length;
-            stat = eDone + " / 6 bloques";
           }
 
           return (
@@ -262,11 +252,56 @@ export default function Home({ t, onNavigate, mastered, mana }) {
         })}
       </div>
 
+      {/* ── Elemental — sección accesoria ───────────────────────────────────── */}
+      <div style={{ marginTop: 32 }}>
+        <div style={{
+          display: "flex", alignItems: "center", gap: 10,
+          marginBottom: 12,
+        }}>
+          <div style={{ flex: 1, height: 1, background: t.border }} />
+          <span style={{ fontSize: 11, color: t.muted, letterSpacing: 1, textTransform: "uppercase" }}>
+            Herramientas
+          </span>
+          <div style={{ flex: 1, height: 1, background: t.border }} />
+        </div>
+        <button
+          onClick={() => onNavigate("elemental")}
+          style={{
+            width: "100%",
+            background: "none",
+            border: "1px solid " + t.border,
+            borderRadius: 12,
+            padding: "14px 18px",
+            cursor: "pointer",
+            textAlign: "left",
+            display: "flex",
+            alignItems: "center",
+            gap: 14,
+          }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = t.muted; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = t.border; }}
+        >
+          <span style={{ fontSize: 20 }}>🔤</span>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 14, color: t.muted, fontWeight: 600 }}>Elemental</div>
+            <div style={{ fontSize: 12, color: t.subtle, marginTop: 2 }}>
+              Alefato y vocales — consulta cuando lo necesites
+            </div>
+          </div>
+          {(() => {
+            const eDone = Object.values(p.elementalDone || {}).filter(Boolean).length;
+            return (
+              <span style={{ fontSize: 11, color: t.subtle }}>{eDone}/6</span>
+            );
+          })()}
+        </button>
+      </div>
+
       {/* ── Streak ──────────────────────────────────────────────────────────── */}
       {p.streak > 0 && (
         <div style={{
           textAlign: "center",
-          marginTop: 28,
+          marginTop: 24,
           color: t.muted,
           fontSize: 12,
         }}>
